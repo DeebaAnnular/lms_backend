@@ -84,22 +84,26 @@ exports.register = async (req, res) => {
       .json({ message: "Error registering user", error: error.message });
   }
 };
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  const [user] = await User.findByEmail(email);
-  if (!user.length) {
+
+  const user = await User.findByEmail(email);
+
+  if (!user) {
     return res.status(400).json({ message: "Invalid credentials" });
   }
 
-  const validPassword = await comparePassword(password, user[0].password);
+  const validPassword = await comparePassword(password, user.password);
   if (!validPassword) {
     return res.status(400).json({ message: "Invalid credentials" });
   }
 
-  const token = generateToken({ id: user[0].id });
-  const userType =
-    email === "selvagugan@annulartechnoloies.com" ? "approver" : "employee";
-  res.json({ userType, email, token });
+  const token = generateToken({ id: user.userId });
+  const user_id = user.userId;
+  const user_type = email === "selvagugan@annulartechnoloies.com" ? "approver" : "employee";
+
+  res.json({ user_type, user_id,email, token });
 };
 
 exports.forgetPassword = async (req, res) => {

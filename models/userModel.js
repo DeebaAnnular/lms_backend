@@ -1,7 +1,16 @@
 const db = require("../config/db");
 class User {
-  static findByEmail(email) {
-    return db.execute("SELECT * FROM users WHERE work_email = ?", [email]);
+ 
+  static async findByEmail(email) {
+    const [rows] = await db.execute("SELECT * FROM users WHERE work_email = ?", [email]);
+    if (rows.length > 0) {
+      const user = rows[0];
+      return {
+        userId: user.user_id,
+        ...user
+      };
+    }
+    return null;
   }
 
   static create(user) {
