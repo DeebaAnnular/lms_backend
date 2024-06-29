@@ -34,7 +34,7 @@ CREATE TABLE leaves (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-*****Leave Request*****
+*****Leave Request table*****
 CREATE TABLE leave_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,

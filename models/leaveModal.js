@@ -239,6 +239,53 @@ static async getLeaveRequestDetails(requestId) {
   }
 }
 
+// user leave history by id
+static async getLeaveHistoryByUserId(userId) {
+  // Validate input parameters
+  if (!Number.isInteger(userId)) {
+    throw new Error("Invalid input types for userId, limit, or offset");
+  }
+
+  const query = `
+    SELECT 
+      leave_request_id, 
+      user_id, 
+      emp_name, 
+      from_date, 
+      to_date, 
+      total_days, 
+      leave_type, 
+      status, 
+      reason, 
+      created_at, 
+      updated_at 
+    FROM 
+      leave_requests 
+    WHERE 
+      user_id = ? 
+   
+  `;
+
+  try {
+    // Execute the query with the provided parameters
+    const [rows] = await db.execute(query, [userId]);
+
+    // If no rows are returned, throw an error
+    if (rows.length === 0) {
+      throw new Error("Leave request not found");
+    }
+
+    // Return the fetched rows
+    return rows;
+  } catch (error) {
+    // Log the error and rethrow it
+    console.error("Error in getLeaveHistoryByUserId:", error);
+    throw error;
+  }
+}
+
+
+
 
 }
 

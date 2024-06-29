@@ -152,3 +152,33 @@ exports.applyLeave = async (req, res) => {
       res.status(500).json({ message: "Error updating leave request status", error: error.message });
     }
   };
+
+
+  exports.getLeaveHistory = async (req, res) => {
+    try {
+      // Parse userId from request parameters
+      const userId = parseInt(req.params.userId);
+      
+     
+  
+      // Validate userId
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+  
+      // Fetch leave history using the service method
+      const leaveHistory = await EmployeeLeave.getLeaveHistoryByUserId(userId);
+  
+      // Respond with the leave history data and pagination info
+      res.json({
+        message: "Leave history retrieved successfully",
+        data: leaveHistory,
+        
+      });
+    } catch (error) {
+      // Log the error and respond with an error message
+      console.error("Error in getLeaveHistory:", error);
+      res.status(500).json({ message: "Error retrieving leave history", error: error.message });
+    }
+  };
+  
