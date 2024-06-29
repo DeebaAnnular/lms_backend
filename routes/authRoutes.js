@@ -5,6 +5,7 @@ const {
   forgetPassword,
   resetPassword,
   getAllUsers,
+  getUserById
  
   
 } = require("../controllers/authController");
@@ -15,6 +16,7 @@ router.post("/login", login);
 router.post("/forgot-password", forgetPassword);
 router.post("/reset-password", resetPassword);
 router.get("/users", getAllUsers);
+router.get('/user/:userId',getUserById);
 
 
 

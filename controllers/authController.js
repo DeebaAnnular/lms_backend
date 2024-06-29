@@ -17,6 +17,8 @@ const { hashPassword, comparePassword } = require("../utils/hash");
 //   res.status(201).json({ message: "User registerd successfully" });
 // };
 
+// 
+
 exports.register = async (req, res) => {
   try {
     let {
@@ -38,21 +40,15 @@ exports.register = async (req, res) => {
       const [day, month, year] = date_of_joining.split("-");
       date_of_joining = `${year}-${month}-${day}`;
     } else if (!date_of_joining.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      return res
-        .status(400)
-        .json({
-          message: "Invalid date format. Use YYYY-MM-DD or DD-MM-YYYY.",
-        });
+      return res.status(400).json({
+        message: "Invalid date format. Use YYYY-MM-DD or DD-MM-YYYY.",
+      });
     }
 
-    // Validate gender
-    // if (!['M', 'F', 'O'].includes(gender)) {
-    //   return res.status(400).json({ message: "Invalid gender. Use 'M', 'F', or 'O'." });
-    // }
+    const existingUser = await User.findByEmail(work_email);
+    console.log('Database query result:', existingUser);
 
-    // Check if work email already exists
-    const [existingUser] = await User.findByEmail(work_email);
-    if (existingUser.length) {
+    if (existingUser) {
       return res.status(400).json({ message: "Work email already exists" });
     }
 
@@ -85,6 +81,7 @@ exports.register = async (req, res) => {
   }
 };
 
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -101,9 +98,11 @@ exports.login = async (req, res) => {
 
   const token = generateToken({ id: user.userId });
   const user_id = user.userId;
-  const user_type = email === "selvagugan@annulartechnoloies.com" ? "approver" : "employee";
+  const emp_name = user.emp_name;
+  const user_type =
+    email === "selvagugan@annulartechnoloies.com" ? "approver" : "employee";
 
-  res.json({ user_type, user_id,email, token });
+  res.json({ user_type, user_id, emp_name,email,  token });
 };
 
 exports.forgetPassword = async (req, res) => {
@@ -167,5 +166,22 @@ exports.getAllUsers = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching users", error: error.message });
+  }
+};
+
+exports.getUserById = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const [user] = await User.getUserDetailsById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Error fetching user", error: error.message });
   }
 };
