@@ -170,25 +170,43 @@ class EmployeeLeave {
   }
   
 //   ************ create leave request
-static async createLeaveRequest(userId, empName, fromDate, toDate, totalDays, leaveType) {
-       // Validate inputs
-    if (!userId || !empName || !fromDate || !toDate || !totalDays || !leaveType) {
-      throw new Error("All fields are required for creating a leave request");
-    }
-  
-    const query = `
-      INSERT INTO leave_requests (user_id, emp_name, from_date, to_date, total_days, leave_type)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-  
-    try {
-      const [result] = await db.execute(query, [userId, empName, fromDate, toDate, totalDays, leaveType]);
-      return result.insertId;
-    } catch (error) {
-      console.error("Error in createLeaveRequest:", error);
-      throw error;
-    }
+static async createLeaveRequest(userId, empName, fromDate, toDate, totalDays, leaveType, session) {
+  // Validate inputs
+  if (!userId || !empName || !fromDate || !toDate || totalDays === undefined || !leaveType || !session) {
+    throw new Error("All fields are required for creating a leave request");
   }
+
+  // Ensure totalDays is a valid number (including decimals)
+  if (isNaN(parseFloat(totalDays))) {
+    throw new Error("totalDays must be a valid number or decimal");
+  }
+
+  // Convert totalDays to a float with 2 decimal places
+  const parsedTotalDays = parseFloat(parseFloat(totalDays).toFixed(2));
+
+  const query = `
+    INSERT INTO leave_requests (user_id, emp_name, from_date, to_date, total_days, leave_type, session)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  try {
+    console.log("Creating leave request with params:", { 
+      userId, empName, fromDate, toDate, totalDays: parsedTotalDays, leaveType, session 
+    });
+    
+    const [result] = await db.execute(query, [
+      userId, empName, fromDate, toDate, parsedTotalDays, leaveType, session
+    ]);
+    
+    console.log("Leave request created successfully. Insert ID:", result.insertId);
+    return result.insertId;
+  } catch (error) {
+    console.error("Error in createLeaveRequest:", error);
+    console.error("Query:", query);
+    console.error("Params:", [userId, empName, fromDate, toDate, parsedTotalDays, leaveType, session]);
+    throw error;
+  }
+}
 
 // ********** get pending leave request
 
@@ -226,7 +244,7 @@ static async updateLeaveRequestStatus(requestId, status) {
 
   
 static async getLeaveRequestDetails(requestId) {
-  const query = "SELECT leave_request_id, user_id, emp_name, from_date, to_date, total_days, leave_type, status, reason, created_at, updated_at FROM leave_requests WHERE leave_request_id = ?";
+  const query = "SELECT leave_request_id, user_id, emp_name, from_date, to_date, sesssion total_days, leave_type, status, reason, created_at, updated_at FROM leave_requests WHERE leave_request_id = ?";
   try {
     const [rows] = await db.execute(query, [requestId]);
     if (rows.length === 0) {
@@ -254,6 +272,7 @@ static async getLeaveHistoryByUserId(userId) {
       from_date, 
       to_date, 
       total_days, 
+      session,
       leave_type, 
       status, 
       reason, 

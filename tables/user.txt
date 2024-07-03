@@ -36,6 +36,14 @@ CREATE TABLE leaves (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+ALTER TABLE leaves
+MODIFY COLUMN earned_leave DECIMAL(10, 1) ,
+MODIFY COLUMN sick_leave DECIMAL(10, 1) ,
+MODIFY COLUMN maternity_leave DECIMAL(10, 1) ,
+MODIFY COLUMN optional_leave DECIMAL(10, 1) ,
+MODIFY COLUMN loss_of_pay DECIMAL(10, 1) ,
+MODIFY COLUMN work_from_home DECIMAL(10, 1) ;
+
 *****Leave Request table*****
 CREATE TABLE leave_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -51,3 +59,6 @@ CREATE TABLE leave_requests (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
   reason Text
 );
+
+ALTER TABLE leave_requests
+MODIFY COLUMN total_days DECIMAL(10, 1) NOT NULL;
