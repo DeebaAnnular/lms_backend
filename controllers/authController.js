@@ -3,22 +3,6 @@ const User = require("../models/userModel");
 const { generateToken, verifyToken } = require("../utils/token");
 const { hashPassword, comparePassword } = require("../utils/hash");
 
-// const transporter = require('../config/mailer');
-
-// exports.register = async (req, res) => {
-//   const { email, password } = req.body;
-//   const [user] = await User.findByEmail(email);
-//   if (user.length) {
-//     return res.status(400).json({ message: "Email already exists" });
-//   }
-
-//   const hashedPassword = await hashPassword(password);
-//   await User.create({ email, password: hashedPassword });
-//   res.status(201).json({ message: "User registerd successfully" });
-// };
-
-// 
-
 exports.register = async (req, res) => {
   try {
     let {
@@ -33,6 +17,7 @@ exports.register = async (req, res) => {
       personal_email,
       work_email,
       password,
+      role = "employee",
     } = req.body;
 
     // Validate and format date
@@ -46,7 +31,7 @@ exports.register = async (req, res) => {
     }
 
     const existingUser = await User.findByEmail(work_email);
-    console.log('Database query result:', existingUser);
+    console.log("Database query result:", existingUser);
 
     if (existingUser) {
       return res.status(400).json({ message: "Work email already exists" });
@@ -66,6 +51,7 @@ exports.register = async (req, res) => {
       personal_email,
       work_email,
       password: hashedPassword,
+      role,
     };
 
     console.log("User data to be inserted:", newUser);
@@ -81,6 +67,24 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { userId, newRole } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await User.updateRole(userId, newRole);
+    res.status(200).json({ message: "User role updated successfully" });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    res
+      .status(500)
+      .json({ message: "Error updating user role", error: error.message });
+  }
+};
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -98,50 +102,47 @@ exports.login = async (req, res) => {
 
   const token = generateToken({ id: user.userId });
   const user_id = user.userId;
-  const emp_name = user.emp_name;
-  const user_type =
-    email === "selvagugan@annulartechnoloies.com" ? "approver" : "employee";
+  const emp_name = user.empName;
+  const emp_id = user.empId;
+  const user_role = user.userRole;
 
-  res.json({ user_type, user_id, emp_name,email,  token });
+  res.json({ user_id, emp_name, emp_id, user_role, email, token });
 };
 
 exports.forgetPassword = async (req, res) => {
   const { email } = req.body;
-  const [user] = await User.findByEmail(email);
-  if (!user.length) {
+  const user = await User.findByEmail(email);
+  if (!user) {
     return res.status(400).json({ message: "Email not found" });
   }
-  const token = generateToken({ email: user[0].email });
+  const token = generateToken({ email: user.work_email });
   const resetLink = `http://localhost:3000/reset-password/${token}`;
   const transporter = nodemailer.createTransport({
-    //  service: "gmail",
     host: "smtp.office365.com",
     port: 587,
     secure: false,
     auth: {
       user: "benisha.b@annulartechnologies.com",
       pass: "titpnrxooqgtxknt",
-      //  user: "deebalakshmi2019@gmail.com",
-      //  pass: "cdlzhewqdhkzswov"
     },
   });
 
   const mailOptions = {
     from: "benisha.b@annulartechnologies.com",
     to: email,
-    subject: "Nodemailer Test",
-    html: "hi everyoneyy https://mail.google.com",
+    subject: "Password Reset",
+    html: `Click this link to reset your password: ${resetLink}`,
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
+      res.status(500).json({ message: "Error sending email" });
     } else {
       console.log("Email sent: " + info.response);
+      res.json({ message: "Password reset link sent to email" });
     }
   });
-
-  res.json({ message: "Password reset link sent to email" });
 };
 
 exports.resetPassword = async (req, res) => {
@@ -159,7 +160,22 @@ exports.resetPassword = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const [users] = await User.getAllUsers();
+    const [rows] = await User.getAllUsers();
+    const users = rows.map((row) => ({
+      user_id: row.user_id,
+      emp_id: row.emp_id,
+      emp_name: row.emp_name,
+      gender: row.gender,
+      date_of_joining: row.date_of_joining,
+      contact_number: row.contact_number,
+      work_location: row.work_location,
+      active_status: row.active_status,
+      designation: row.designation,
+      role: row.role,
+      work_email: row.work_email,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
     res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -173,15 +189,33 @@ exports.getUserById = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const [user] = await User.getUserDetailsById(userId);
+    const [rows] = await User.getUserDetailsById(userId);
 
-    if (!user) {
+    if (rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    const user = {
+      user_id: rows[0].user_id,
+      emp_id: rows[0].emp_id,
+      emp_name: rows[0].emp_name,
+      gender: rows[0].gender,
+      date_of_joining: rows[0].date_of_joining,
+      contact_number: rows[0].contact_number,
+      work_location: rows[0].work_location,
+      active_status: rows[0].active_status,
+      designation: rows[0].designation,
+      role: rows[0].role,
+      work_email: rows[0].work_email,
+      created_at: rows[0].created_at,
+      updated_at: rows[0].updated_at,
+    };
 
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user:", error);
-    res.status(500).json({ message: "Error fetching user", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching user", error: error.message });
   }
 };

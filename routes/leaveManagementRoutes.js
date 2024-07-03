@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  applyLeave,
   getLeaveBalance,
   updateLeaveBalance,
   createLeaveRequest,
@@ -14,10 +13,10 @@ const router = express.Router();
 //leave management routes
 // router.post("/apply-leave", applyLeave);
 router.get("/leave-balance/:userId", getLeaveBalance);
-router.post("/update-leave-balance", updateLeaveBalance);
-router.post("/request-leave", createLeaveRequest);
-router.get("/get-all-leave-request", getPendingLeaveRequests);
+router.post("/update-leave-balance", updateLeaveBalance); /*done */
+router.post("/request-leave", createLeaveRequest); /*done */
+router.get("/get-all-leave-request", getPendingLeaveRequests);  /*done */
 router.put("/update-leave-status", approveOrRejectLeave);
-router.get('/leave-history/:userId', getLeaveHistory);
+router.get('/leave-history/:userId', getLeaveHistory); /*done */
 
 module.exports = router;

@@ -2,16 +2,7 @@ const EmployeeLeave = require("../models/leaveModal");
 const User = require("../models/userModel");
 const { validateLeaveBalances } = require("../utils/validateLeaveType");
 // Apply for leave
-exports.applyLeave = async (req, res) => {
-    try {
-      const { userId, leaveType, days } = req.body;
-      await EmployeeLeave.applyLeave(userId, leaveType, days);
-      res.status(200).json({ message: "Leave applied successfully" });
-    } catch (error) {
-      console.error("Error applying leave:", error);
-      res.status(500).json({ message: "Error applying leave", error: error.message });
-    }
-  };
+
   
   // Get leave balance
   exports.getLeaveBalance = async (req, res) => {
@@ -64,7 +55,7 @@ exports.applyLeave = async (req, res) => {
   exports.createLeaveRequest = async (req, res) => {
     try {
       const { user_id, from_date, to_date, total_days, leave_type } = req.body;
-      
+  
       // Validate that all required fields are present
       if (!user_id || !from_date || !to_date || !total_days || !leave_type) {
         return res.status(400).json({ message: "All fields are required" });
@@ -76,9 +67,36 @@ exports.applyLeave = async (req, res) => {
         return res.status(404).json({ message: "User not found" });
       }
   
-      // Now create the leave request using the user's data
-      const leaveRequestId = await EmployeeLeave.createLeaveRequest(user_id, user.emp_name, from_date, to_date, total_days, leave_type);
-      
+      // Get current leave balance
+      const currentBalance = await EmployeeLeave.getCurrentLeaveBalance(user_id);
+      if (!currentBalance) {
+        return res.status(404).json({ message: "Current leave balance not found" });
+      }
+  
+      // Calculate new balance
+      const newBalance = currentBalance[leave_type] - total_days;
+      if (newBalance < 0) {
+        return res.status(400).json({ message: "Insufficient leave balance" });
+      }
+  
+      // Prepare leave balance update
+      const leaveBalances = {
+        [leave_type]: newBalance
+      };
+  
+      // Update leave balance
+      await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
+  
+      // Create the leave request using the user's data
+      const leaveRequestId = await EmployeeLeave.createLeaveRequest(
+        user_id,
+        user.emp_name,
+        from_date,
+        to_date,
+        total_days,
+        leave_type
+      );
+  
       res.status(201).json({
         message: "Leave request created successfully",
         leaveRequestId,
@@ -122,26 +140,33 @@ exports.applyLeave = async (req, res) => {
   
       // Get leave request details
       const leaveRequest = await EmployeeLeave.getLeaveRequestDetails(requestId);
+      if (!leaveRequest) {
+        return res.status(404).json({ message: "Leave request not found" });
+      }
   
       // Update leave request status and reason if rejected
       if (status === 'rejected' && !reason) {
-        throw new Error("Reason is required for rejection");
+        return res.status(400).json({ message: "Reason is required for rejection" });
       }
+  
       await EmployeeLeave.updateLeaveRequestStatus(requestId, status, reason);
   
-      // If approved, update leave balance
-      if (status === 'approved') {
+      // If rejected, add the total days back to the leave balance
+      if (status === 'rejected') {
         // Get current leave balance
         const currentBalance = await EmployeeLeave.getCurrentLeaveBalance(leaveRequest.user_id);
-        
+        if (!currentBalance) {
+          return res.status(404).json({ message: "Current leave balance not found" });
+        }
+  
         // Calculate new balance
-        const newBalance = currentBalance[leaveRequest.leave_type] - leaveRequest.total_days;
-        
+        const newBalance = currentBalance[leaveRequest.leave_type] + leaveRequest.total_days;
+  
         // Prepare leave balance update
         const leaveBalances = {
           [leaveRequest.leave_type]: newBalance
         };
-        
+  
         // Update leave balance
         await EmployeeLeave.updateLeaveBalance(leaveRequest.user_id, leaveBalances);
       }
@@ -152,7 +177,7 @@ exports.applyLeave = async (req, res) => {
       res.status(500).json({ message: "Error updating leave request status", error: error.message });
     }
   };
-
+  
 
   exports.getLeaveHistory = async (req, res) => {
     try {
