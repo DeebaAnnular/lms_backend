@@ -54,7 +54,7 @@ const { validateLeaveBalances } = require("../utils/validateLeaveType");
   };
   exports.createLeaveRequest = async (req, res) => {
     try {
-      const { user_id, from_date, to_date, total_days, leave_type } = req.body;
+      const { user_id, from_date, to_date,session, total_days, leave_type } = req.body;
   
       // Validate that all required fields are present
       if (!user_id || !from_date || !to_date || !total_days || !leave_type) {
@@ -93,6 +93,7 @@ const { validateLeaveBalances } = require("../utils/validateLeaveType");
         user.emp_name,
         from_date,
         to_date,
+        session,
         total_days,
         leave_type
       );
@@ -105,6 +106,7 @@ const { validateLeaveBalances } = require("../utils/validateLeaveType");
           emp_name: user.emp_name,
           from_date,
           to_date,
+          session,
           total_days,
           leave_type,
           status: 'pending'
@@ -160,7 +162,9 @@ const { validateLeaveBalances } = require("../utils/validateLeaveType");
         }
   
         // Calculate new balance
-        const newBalance = currentBalance[leaveRequest.leave_type] + leaveRequest.total_days;
+        const newBalance = parseFloat(currentBalance[leaveRequest.leave_type]) + parseFloat(leaveRequest.total_days);
+
+        console.log("new balance: ",typeof(newBalance))
   
         // Prepare leave balance update
         const leaveBalances = {

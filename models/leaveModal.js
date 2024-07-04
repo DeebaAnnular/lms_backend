@@ -170,19 +170,19 @@ class EmployeeLeave {
   }
   
 //   ************ create leave request
-static async createLeaveRequest(userId, empName, fromDate, toDate, totalDays, leaveType) {
+static async createLeaveRequest(userId, empName, fromDate, toDate, session,totalDays, leaveType) {
        // Validate inputs
     if (!userId || !empName || !fromDate || !toDate || !totalDays || !leaveType) {
       throw new Error("All fields are required for creating a leave request");
     }
   
     const query = `
-      INSERT INTO leave_requests (user_id, emp_name, from_date, to_date, total_days, leave_type)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO leave_requests (user_id, emp_name, from_date, to_date, session, total_days, leave_type)
+      VALUES (?, ?, ?, ?, ?, ?,?)
     `;
   
     try {
-      const [result] = await db.execute(query, [userId, empName, fromDate, toDate, totalDays, leaveType]);
+      const [result] = await db.execute(query, [userId, empName, fromDate, toDate, session, totalDays, leaveType]);
       return result.insertId;
     } catch (error) {
       console.error("Error in createLeaveRequest:", error);
