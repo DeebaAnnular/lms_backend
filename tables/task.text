@@ -8,3 +8,33 @@ CREATE TABLE tasks(
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+
+++++++++++++
+not used table
+CREATE TABLE Daily_status (
+    date_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    user_id INT NOT NULL,
+    total_duration INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
++++++++++++++++
+
+
+
+CREATE TABLE Weekly_status (
+    week_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    approved_by INT,
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (approved_by) REFERENCES users(user_id)
+);

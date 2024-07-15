@@ -1,0 +1,194 @@
+[
+  {
+    "from_date": "2024-07-08",
+    "to_date": "2024-07-17",
+    "user_id": 6,
+    "total_week_time":"44:30:00",
+    "tasks": [
+      {
+        "task_date": "2024-07-08",
+        "total_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 1,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 2,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 3,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 4,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      },
+      {
+        "task_date": "2024-07-09",
+        "total_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 1,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 2,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 3,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 4,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      },
+      {
+        "task_date": "2024-07-10",
+        "total_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 1,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 2,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 3,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 4,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      },
+      {
+        "task_date": "2024-07-11",
+        "total_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 5,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 6,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 7,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 8,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      },
+      {
+        "task_date": "2024-07-12",
+        "total_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 9,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 10,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 11,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 12,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      },
+      {
+        "task_date": "2024-07-13",
+        "total_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 13,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 14,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 15,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 16,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      },
+      {
+        "task_date": "2024-07-14",
+        "total_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 17,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 18,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 19,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 12,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      },
+      {
+        "task_date": "2024-07-15",
+        "total_day_time": "12:30:00",
+        "tasks": [
+          {
+            "task_id": 21,
+            "task_name": "Bug fixing",
+            "taks_time": "02:00:20"
+          }, {
+            "task_id": 22,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 23,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }, {
+            "task_id": 24,
+            "task_name": "Bug fixing",
+            "taks_time": "02:11:20"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -10,7 +10,6 @@ CREATE TABLE users (
     work_location VARCHAR(255) NOT NULL,
     active_status BOOLEAN NOT NULL DEFAULT TRUE,
     designation VARCHAR(255) NOT NULL,
-    personal_email VARCHAR(255) UNIQUE NOT NULL,
     work_email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
