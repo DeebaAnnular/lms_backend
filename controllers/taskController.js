@@ -41,15 +41,22 @@ exports.getTaskById = async (req, res) => {
 
 exports.updateTask = async (req, res) => {
   try {
-    const result = await EmployeeTask.updateTask(req.params.id, req.body);
-    if (result.affectedRows > 0) {
-      const task = { ...req.body, task_id: req.params.id };
-      task.task_date = format(new Date(task.task_date), "yyyy-MM-dd");
-      res.status(200).json(task);
-    } else {
-      res.status(404).json({ error: "Task not found" });
+    const taskId = req.params.id;
+    const task = req.body;
+
+    // Validate input
+    if (!task.task_name || !task.task_time || !task.task_date || !task.user_id) {
+      return res.status(400).json({ error: "All task details are required" });
     }
+
+    // Attempt to update the task
+    const results = await EmployeeTask.updateTask(taskId, task);
+
+    res.status(200).json({
+      message: "Task updated successfully",
+    });
   } catch (error) {
+    console.error("Controller error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -74,9 +81,7 @@ exports.getWeeklyData = async (req, res) => {
     const toDate = req.query.toDate;
 
     if (!fromDate || !toDate) {
-      return res
-        .status(400)
-        .json({ error: "Both fromDate and toDate are required" });
+      return res.status(400).json({ error: "Both fromDate and toDate are required" });
     }
 
     const tasks = await EmployeeTask.getWeeklyData(userId, fromDate, toDate);
@@ -87,6 +92,9 @@ exports.getWeeklyData = async (req, res) => {
       task_id: task.task_id.split(",").map((id) => parseInt(id.trim(), 10)),
       task_name: task.task_name.split(",").map((name) => name.trim()),
       total_hours_per_day: parseFloat(task.total_hours_per_day).toFixed(2),
+      approved_status: task.approved_status,
+      approved_by_name: task.approved_by_name,
+      reason: task.reason // Include the reject_reason in the response
     }));
 
     // Calculate the total hours
@@ -105,7 +113,6 @@ exports.getWeeklyData = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 // controllers/weeklyStatusController.js
 
 exports.createWeeklyStatus = async (req, res) => {
@@ -139,72 +146,49 @@ exports.createWeeklyStatus = async (req, res) => {
   }
 };
 
-exports.approveWeeklyStatus = async (req, res) => {
+exports.updateApprovalStatus = async (req, res) => {
   try {
-    const { weekId } = req.params;
-    const { approvedBy } = req.body;
+    const { approvedStatus, approvedById, taskIds } = req.body;
 
-    // Validate input
-    if (!weekId || !approvedBy) {
+    if (!approvedStatus || !approvedById || !taskIds || !Array.isArray(taskIds)) {
       return res
         .status(400)
-        .json({ error: "weekId and approvedBy are required" });
+        .json({ error: "approvedStatus, approvedById, and taskIds are required and taskIds should be an array" });
     }
 
-    // Approve the weekly status
-    const success = await EmployeeTask.updateWeeklyStatusToApproved(
-      weekId,
-      approvedBy
-    );
+    const results = await EmployeeTask.updateApprovalStatus(approvedStatus, approvedById, taskIds);
 
-    if (success) {
-      const updatedStatus = await EmployeeTask.getWeeklyStatusById(weekId);
-      res.status(200).json({
-        message: "Weekly status approved successfully",
-        weeklyStatus: updatedStatus,
-      });
-    } else {
-      res.status(404).json({ error: "Weekly status not found" });
-    }
+    res.status(200).json({
+      message: "Tasks Approved successfully",
+    
+    });
   } catch (error) {
-    console.error("Error in approveWeeklyStatus:", error);
+    console.error("Controller error:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.rejectWeeklyStatus = async (req, res) => {
+exports.updateRejectStatus = async (req, res) => {
   try {
-    const { weekId } = req.params;
-    const { comment, approvedBy } = req.body;
+    const { rejectedStatus, rejectedById, rejectReason, taskIds } = req.body;
 
-    // Validate input
-    if (!weekId || !comment || !approvedBy) {
-      return res
-        .status(400)
-        .json({ error: "weekId, comment, and approvedBy are required" });
+    if (!rejectedStatus || !rejectedById || !rejectReason || !taskIds || !Array.isArray(taskIds)) {
+      return res.status(400).json({ error: "Rejected status, rejectedById, rejectReason, and taskIds are required and taskIds should be an array" });
     }
 
-    // Reject the weekly status
-    const success = await EmployeeTask.updateWeeklyStatusToRejected(
-      weekId,
-      comment,
-      approvedBy
-    );
+    const results = await EmployeeTask.updateRejectStatus(rejectedStatus, rejectedById, rejectReason, taskIds);
 
-    if (success) {
-      const updatedStatus = await EmployeeTask.getWeeklyStatusById(weekId);
-      res.status(200).json({
-        message: "Weekly status rejected successfully",
-        weeklyStatus: updatedStatus,
-      });
-    } else {
-      res.status(404).json({ error: "Weekly status not found" });
-    }
+    res.status(200).json({
+      message: "Tasks rejected successfully",
+      
+    });
   } catch (error) {
-    console.error("Error in rejectWeeklyStatus:", error);
+    console.error("Controller error:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
 exports.getAllWeeklyStatuses = async (req, res) => {
   try {
     const weeklyStatuses = await EmployeeTask.getAllWeeklyStatuses();

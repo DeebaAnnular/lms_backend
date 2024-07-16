@@ -24,13 +24,37 @@ class EmployeeTask {
   };
 
   static updateTask = async (id, task) => {
-    const [rows] = await db.query(
-      `UPDATE tasks 
-       SET task_name = ?, task_time = ?, task_date = ?, user_id = ?, updated_at = NOW() 
-       WHERE task_id = ?`,
-      [task.task_name, task.task_time, task.task_date, task.user_id, id]
-    );
-    return rows;
+    try {
+      // Check the current approval status of the task
+      const [checkRows] = await db.query(
+        `SELECT approved_status FROM tasks WHERE task_id = ?`,
+        [id]
+      );
+
+      if (checkRows.length === 0) {
+        throw new Error('Task not found');
+      }
+
+      const currentStatus = checkRows[0].approved_status;
+
+      // If the task is already approved, do not allow updates
+      if (currentStatus === 'approved') {
+        throw new Error('Task is already approved and cannot be updated');
+      }
+
+      // Proceed with the update if the task is not approved
+      const [rows] = await db.query(
+        `UPDATE tasks 
+         SET task_name = ?, task_time = ?, task_date = ?, user_id = ?, updated_at = NOW() 
+         WHERE task_id = ?`,
+        [task.task_name, task.task_time, task.task_date, task.user_id, id]
+      );
+
+      return rows;
+    } catch (error) {
+      console.error("Error in updateTask:", error);
+      throw error;
+    }
   };
 
   static deleteTask = async (id) => {
@@ -47,7 +71,11 @@ class EmployeeTask {
           DATE_FORMAT(task_date, '%d-%m-%Y') AS day,
           GROUP_CONCAT(task_id SEPARATOR ',') AS task_id,
           GROUP_CONCAT(task_name SEPARATOR ',') AS task_name,
-          SUM(TIME_TO_SEC(task_time) / 3600) AS total_hours_per_day
+          SUM(TIME_TO_SEC(task_time) / 3600) AS total_hours_per_day,
+          IF(COUNT(DISTINCT approved_status) = 1, MAX(approved_status), NULL) AS approved_status,
+          IF(COUNT(DISTINCT approved_by_id) = 1, MAX(approved_by_id), NULL) AS approved_by_id,
+          IF(COUNT(DISTINCT approved_by_id) = 1, (SELECT emp_name FROM users WHERE user_id = MAX(approved_by_id)), NULL) AS approved_by_name,
+          IF(COUNT(DISTINCT reason) = 1, MAX(reason), NULL) AS reason
         FROM 
           tasks
         WHERE 
@@ -70,7 +98,6 @@ class EmployeeTask {
       throw error;
     }
   };
-
   // create weekly status
   static async createWeeklyStatus(userId, fromDate, toDate) {
     try {
@@ -100,37 +127,54 @@ class EmployeeTask {
     }
   }
 
-  static async updateWeeklyStatusToApproved(weekId, approvedBy) {
+  static updateApprovalStatus = async (approvedStatus, approvedById, taskIds) => {
     try {
       const query = `
-        UPDATE Weekly_status
-        SET status = 'approved', approved_by = ?
-        WHERE week_id = ?
+        UPDATE tasks
+        SET 
+          approved_status = ?,
+          approved_by_id = ?
+        WHERE 
+          task_id IN (?)
       `;
+      
+      console.log("Executing query:", query);
+      console.log("Query parameters:", [approvedStatus, approvedById, taskIds]);
 
-      const [result] = await db.query(query, [approvedBy, weekId]);
-      return result.affectedRows > 0;
+      const [results] = await db.query(query, [approvedStatus, approvedById, taskIds]);
+      console.log("Query results:", results);
+
+      return results;
     } catch (error) {
-      console.error("Error in updateWeeklyStatusToApproved:", error);
+      console.error("Error in updateApprovalStatus:", error);
       throw error;
     }
-  }
+  };
 
-  static async updateWeeklyStatusToRejected(weekId, comment, approvedBy) {
+  static updateRejectStatus = async (rejectedStatus, rejectedById, rejectReason, taskIds) => {
     try {
       const query = `
-        UPDATE Weekly_status
-        SET status = 'rejected', comment = ?, approved_by = ?
-        WHERE week_id = ?
+        UPDATE tasks
+        SET 
+          approved_status = ?,
+          approved_by_id = ?,
+          reason = ?
+        WHERE 
+          task_id IN (?)
       `;
+      
+      console.log("Executing query:", query);
+      console.log("Query parameters:", [rejectedStatus, rejectedById, rejectReason, taskIds]);
 
-      const [result] = await db.query(query, [comment, approvedBy, weekId]);
-      return result.affectedRows > 0;
+      const [results] = await db.query(query, [rejectedStatus, rejectedById, rejectReason, taskIds]);
+      console.log("Query results:", results);
+
+      return results;
     } catch (error) {
-      console.error("Error in updateWeeklyStatusToRejected:", error);
+      console.error("Error in updateRejectStatus:", error);
       throw error;
     }
-  }
+  };
 
   static async getAllWeeklyStatuses() {
     try {

@@ -25,8 +25,8 @@ const {
   deleteTask,
   getWeeklyData,
   createWeeklyStatus,
-  approveWeeklyStatus,
-  rejectWeeklyStatus,
+  updateApprovalStatus,
+  updateRejectStatus,
   getAllWeeklyStatuses
 } = require("../controllers/taskController");
 
@@ -37,8 +37,8 @@ router.put("/update_task_by_id/:id", updateTask);
 router.delete("/delete_task/:id", deleteTask);
 router.get("/weekly/:userId", getWeeklyData);
 router.post("/weekly_status", createWeeklyStatus);
-router.put("/approveWeeklyStatus/:weekId", approveWeeklyStatus);
-router.put("/rejectWeeklyStatus/:weekId", rejectWeeklyStatus);
+router.put("/approve_daily_task", updateApprovalStatus);
+router.put("/reject_daily_task",  updateRejectStatus);
 router.get('/weeklyStatuses', getAllWeeklyStatuses);
 
 module.exports = router;
