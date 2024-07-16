@@ -8,6 +8,17 @@ CREATE TABLE tasks(
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+ALTER TABLE tasks
+ADD COLUMN reason TEXT;
+
+ALTER TABLE tasks
+ADD COLUMN approved_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+ADD COLUMN approved_by_id INT;
+
+ALTER TABLE tasks
+ADD CONSTRAINT FK_approved_by_id
+FOREIGN KEY (approved_by_id) REFERENCES users(user_id);
+
 
 
 ++++++++++++
