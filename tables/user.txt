@@ -58,3 +58,11 @@ CREATE TABLE leave_requests (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
   reason Text
 );
+
+/********create table for holiday managemant ************/
+CREATE TABLE holiday_requests (
+    holiday_id INT AUTO_INCREMENT PRIMARY KEY,
+  date DATE NOT NULL,
+  holiday_type VARCHAR(255) NOT NULL,
+  description TEXT
+);
