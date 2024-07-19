@@ -64,8 +64,6 @@ class EmployeeTask {
 
   static getWeeklyData = async (userId, fromDate, toDate) => {
     try {
-      console.log("data: ", userId, fromDate, toDate);
-
       const query = `
         SELECT 
           DATE_FORMAT(task_date, '%d-%m-%Y') AS day,
@@ -86,12 +84,8 @@ class EmployeeTask {
         ORDER BY 
           task_date
       `;
-      console.log("Executing query:", query);
-      console.log("Query parameters:", [userId, fromDate, toDate]);
-
-      const [results] = await db.query(query, [userId, fromDate, toDate]);
-      console.log("Query results:", results);
-
+     
+      const [results] = await db.query(query, [userId, fromDate, toDate]);    
       return results;
     } catch (error) {
       console.error("Error in getWeeklyData:", error);
@@ -138,12 +132,7 @@ class EmployeeTask {
           task_id IN (?)
       `;
       
-      console.log("Executing query:", query);
-      console.log("Query parameters:", [approvedStatus, approvedById, taskIds]);
-
       const [results] = await db.query(query, [approvedStatus, approvedById, taskIds]);
-      console.log("Query results:", results);
-
       return results;
     } catch (error) {
       console.error("Error in updateApprovalStatus:", error);
@@ -163,12 +152,7 @@ class EmployeeTask {
           task_id IN (?)
       `;
       
-      console.log("Executing query:", query);
-      console.log("Query parameters:", [rejectedStatus, rejectedById, rejectReason, taskIds]);
-
       const [results] = await db.query(query, [rejectedStatus, rejectedById, rejectReason, taskIds]);
-      console.log("Query results:", results);
-
       return results;
     } catch (error) {
       console.error("Error in updateRejectStatus:", error);
