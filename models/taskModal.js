@@ -96,7 +96,7 @@ class EmployeeTask {
   static async createWeeklyStatus(userId, fromDate, toDate) {
     try {
       const query = `
-        INSERT INTO Weekly_status (user_id, from_date, to_date)
+        INSERT INTO weekly_status (user_id, from_date, to_date)
         VALUES (?, ?, ?)
       `;
 
@@ -111,7 +111,7 @@ class EmployeeTask {
   // *********
   static async getWeeklyStatusById(weekId) {
     try {
-      const query = "SELECT * FROM Weekly_status WHERE week_id = ?";
+      const query = "SELECT * FROM weekly_status WHERE week_id = ?";
 
       const [results] = await db.query(query, [weekId]);
       return results[0];
@@ -164,7 +164,7 @@ class EmployeeTask {
     try {
       const query = `
         SELECT ws.*, u.emp_name AS user_name
-        FROM Weekly_status ws
+        FROM weekly_status ws
         JOIN users u ON ws.user_id = u.user_id
       `;
       const [results] = await db.query(query);

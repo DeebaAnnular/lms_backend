@@ -37,10 +37,10 @@ router.get("/get_task_by_id/:id", getTaskById);
 router.put("/update_task_by_id/:id", updateTask);
 router.delete("/delete_task/:id", deleteTask);
 router.get("/weekly/:userId", getWeeklyData);
-router.post("/weekly_status", createWeeklyStatus);
+router.post("/create_weekly_status", createWeeklyStatus);
 router.put("/approve_daily_task", updateApprovalStatus);
 router.put("/reject_daily_task",  updateRejectStatus);
-router.get('/weeklyStatuses', getAllWeeklyStatuses);
+router.get('/get_weekly_status', getAllWeeklyStatuses);
 
 
 module.exports = router;
