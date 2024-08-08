@@ -22,12 +22,12 @@ const sslOptions = {
 
 const server = https.createServer(sslOptions, app);
 
-server.use(express.json());
-server.use(cors());
-server.use("/api/auth", authRoutes);
-server.use("/api/leave", leaveRoutes);
-server.use("/api/task", tasksRoutes);
-server.use("/api/holiday", holidayRoutes);
+app.use(express.json());
+app.use(cors());
+app.use("/api/auth", authRoutes);
+app.use("/api/leave", leaveRoutes);
+app.use("/api/task", tasksRoutes);
+app.use("/api/holiday", holidayRoutes);
 
 const PORT = process.env.PORT || 3000;
 
