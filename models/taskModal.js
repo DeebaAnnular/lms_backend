@@ -30,26 +30,34 @@ class EmployeeTask {
         `SELECT approved_status FROM tasks WHERE task_id = ?`,
         [id]
       );
-
+  
       if (checkRows.length === 0) {
         throw new Error('Task not found');
       }
-
+  
       const currentStatus = checkRows[0].approved_status;
-
+  
       // If the task is already approved, do not allow updates
       if (currentStatus === 'approved') {
         throw new Error('Task is already approved and cannot be updated');
       }
-
-      // Proceed with the update if the task is not approved
+  
+      // Update the task including the approved_status if provided
       const [rows] = await db.query(
         `UPDATE tasks 
-         SET task_name = ?, task_time = ?, task_date = ?, user_id = ?, updated_at = NOW() 
+         SET task_name = ?, task_time = ?, task_date = ?, user_id = ?, 
+             approved_status = ?, updated_at = NOW() 
          WHERE task_id = ?`,
-        [task.task_name, task.task_time, task.task_date, task.user_id, id]
+        [
+          task.task_name, 
+          task.task_time, 
+          task.task_date, 
+          task.user_id, 
+          task.approved_status || currentStatus, // Use the new approved_status if provided, otherwise keep the current one
+          id
+        ]
       );
-
+  
       return rows;
     } catch (error) {
       console.error("Error in updateTask:", error);
