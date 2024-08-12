@@ -27,7 +27,8 @@ const {
   createWeeklyStatus,
   updateApprovalStatus,
   updateRejectStatus,
-  getAllWeeklyStatuses
+  getAllWeeklyStatuses,
+  getWeeklyStatusByUserId
 } = require("../controllers/taskController");
 
 
@@ -41,6 +42,7 @@ router.post("/create_weekly_status", createWeeklyStatus);
 router.put("/approve_daily_task", updateApprovalStatus);
 router.put("/reject_daily_task",  updateRejectStatus);
 router.get('/get_weekly_status', getAllWeeklyStatuses);
+router.get("/get_weekly_status_by_id/:id",  getWeeklyStatusByUserId);
 
 
 module.exports = router;

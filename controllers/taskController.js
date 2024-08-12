@@ -201,3 +201,24 @@ exports.getAllWeeklyStatuses = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getWeeklyStatusByUserId = async (req, res) => {
+  try {
+    const userId = req.params.id;
+  
+    // Fetch weekly status by user_id
+    const weeklyStatuses = await EmployeeTask.getWeeklyStatusByUserId(userId);
+
+    if (!weeklyStatuses || weeklyStatuses.length === 0) {
+      return res.status(404).json({ error: "No weekly statuses found for this user" });
+    }
+
+    res.status(200).json({
+      message: "Weekly statuses fetched successfully",
+      weeklyStatuses,
+    });
+  } catch (error) {
+    console.error("Error in getWeeklyStatusByUserId:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

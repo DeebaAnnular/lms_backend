@@ -129,6 +129,18 @@ class EmployeeTask {
     }
   }
 
+  static async getWeeklyStatusByUserId(userId) {
+    try {
+      const query = "SELECT * FROM weekly_status WHERE user_id = ?";
+  
+      const [results] = await db.query(query, [userId]);
+      return results; // Return all results for the user
+    } catch (error) {
+      console.error("Error in getWeeklyStatusByUserId:", error);
+      throw error;
+    }
+  }
+
   static updateApprovalStatus = async (approvedStatus, approvedById, taskIds) => {
     try {
       const query = `
