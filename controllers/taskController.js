@@ -49,7 +49,20 @@ exports.updateTask = async (req, res) => {
       return res.status(400).json({ error: "All task details are required" });
     }
 
-    // Attempt to update the task
+    // Fetch the current status of the task
+    const currentTask = await EmployeeTask.getTaskById(taskId);
+
+    if (!currentTask) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    // Check if the current status is 'rejected'
+    if (currentTask.status === "rejected") {
+      // Update the status to 'pending'
+      task.status = "pending";
+    }
+
+    // Proceed with updating the task
     const results = await EmployeeTask.updateTask(taskId, task);
 
     res.status(200).json({
