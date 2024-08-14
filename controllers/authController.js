@@ -122,8 +122,8 @@ exports.forgetPassword = async (req, res) => {
     port: 587,
     secure: false,
     auth: {
-      user: "benisha.b@annulartechnologies.com",
-      pass: "titpnrxooqgtxknt",
+      user: "deebalakshmi2019@gmail.com",
+      pass: "ubjxqcanhzdjavap",
     },
   });
 
@@ -217,5 +217,60 @@ exports.getUserById = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching user", error: error.message });
+  }
+};
+
+exports.updateUserDetails = async (req, res) => {
+  try {
+    // Ensure userId is treated as a number
+    const userId = Number(req.params.userId);
+
+    console.log();
+    const {
+      emp_id,
+      emp_name,
+      gender,
+      date_of_joining,
+      contact_number,
+      work_location,
+      active_status,
+      designation,
+      role,
+    } = req.body;
+
+    // Validate and format date
+    let formattedDate = req.body.date_of_joining;
+    if (date_of_joining.match(/^\d{2}-\d{2}-\d{4}$/)) {
+      const [day, month, year] = date_of_joining.split("-");
+      formattedDate = `${year}-${month}-${day}`;
+    } else if (!date_of_joining.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return res.status(400).json({
+        message: "Invalid date format. Use YYYY-MM-DD or DD-MM-YYYY.",
+      });
+    }
+
+    const updatedUser = {
+      emp_id,
+      emp_name,
+      gender,
+      date_of_joining: formattedDate,
+      contact_number,
+      work_location,
+      active_status: Number(active_status),
+      designation,
+      role,
+    };
+
+    const success = await User.updateUser(userId, updatedUser);
+    if (success) {
+      res.status(200).json({ message: "User details updated successfully" });
+    } else {
+      res.status(404).json({ message: "User not found or no changes made" });
+    }
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    res
+      .status(500)
+      .json({ message: "Error updating user details", error: error.message });
   }
 };

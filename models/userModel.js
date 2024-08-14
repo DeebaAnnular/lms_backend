@@ -88,6 +88,50 @@ class User {
       throw error;
     }
   }
+
+  static async updateUser(userId, userData) {
+    try {
+      // Check if emp_id is already used by another user
+      const checkQuery = `SELECT user_id FROM users WHERE emp_id = ? AND user_id != ?`;
+      const [rows] = await db.execute(checkQuery, [userData.emp_id, userId]);
+      
+      if (rows.length > 0) {
+        return { success: false, message: "Duplicate emp_id. Please use a unique emp_id." };
+      }
+  
+      // Proceed with the update if no duplicate found
+      const query = `
+        UPDATE users
+        SET emp_id = ?, emp_name = ?, gender = ?, date_of_joining = ?, contact_number = ?,
+            work_location = ?, active_status = ?, designation = ?, role =?, updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = ?
+      `;
+      
+      const values = [
+        userData.emp_id,
+        userData.emp_name,
+        userData.gender,
+        userData.date_of_joining,
+        userData.contact_number,
+        userData.work_location,
+        userData.active_status,
+        userData.designation,
+        userData.role,
+        userId
+      ];
+  
+      const [result] = await db.execute(query, values);
+      if (result.affectedRows > 0) {
+        return { success: true, message: "User details updated successfully." };
+      } else {
+        return { success: false, message: "User not found or no changes made." };
+      }
+  
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = User;
