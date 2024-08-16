@@ -77,6 +77,7 @@ class EmployeeTask {
           DATE_FORMAT(task_date, '%d-%m-%Y') AS day,
           GROUP_CONCAT(task_id SEPARATOR ',') AS task_id,
           GROUP_CONCAT(task_name SEPARATOR ',') AS task_name,
+          GROUP_CONCAT(task_time SEPARATOR ',') AS task_time,
           SUM(TIME_TO_SEC(task_time) / 3600) AS total_hours_per_day,
           IF(COUNT(DISTINCT approved_status) = 1, MAX(approved_status), NULL) AS approved_status,
           IF(COUNT(DISTINCT approved_by_id) = 1, MAX(approved_by_id), NULL) AS approved_by_id,

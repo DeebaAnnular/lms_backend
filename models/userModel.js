@@ -19,6 +19,23 @@ class User {
     return null;
   }
 
+  static async findByEmpId(emp_id) {
+    const [rows] = await db.execute("SELECT * FROM users WHERE emp_id = ?", [
+      emp_id,
+    ]);
+    if (rows.length > 0) {
+      const user = rows[0];
+      return {
+        userId: user.user_id,
+        empName: user.emp_name,
+        empId: user.emp_id,
+        userRole: user.role,
+        ...user,
+      };
+    }
+    return null;
+  }
+
   static create(user) {
     console.log("Date being inserted:", user.date_of_joining);
     return db.execute(
@@ -94,11 +111,14 @@ class User {
       // Check if emp_id is already used by another user
       const checkQuery = `SELECT user_id FROM users WHERE emp_id = ? AND user_id != ?`;
       const [rows] = await db.execute(checkQuery, [userData.emp_id, userId]);
-      
+
       if (rows.length > 0) {
-        return { success: false, message: "Duplicate emp_id. Please use a unique emp_id." };
+        return {
+          success: false,
+          message: "Duplicate emp_id. Please use a unique emp_id.",
+        };
       }
-  
+
       // Proceed with the update if no duplicate found
       const query = `
         UPDATE users
@@ -106,7 +126,7 @@ class User {
             work_location = ?, active_status = ?, designation = ?, role =?, updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
       `;
-      
+
       const values = [
         userData.emp_id,
         userData.emp_name,
@@ -117,16 +137,18 @@ class User {
         userData.active_status,
         userData.designation,
         userData.role,
-        userId
+        userId,
       ];
-  
+
       const [result] = await db.execute(query, values);
       if (result.affectedRows > 0) {
         return { success: true, message: "User details updated successfully." };
       } else {
-        return { success: false, message: "User not found or no changes made." };
+        return {
+          success: false,
+          message: "User not found or no changes made.",
+        };
       }
-  
     } catch (error) {
       console.error("Error updating user:", error);
       throw error;

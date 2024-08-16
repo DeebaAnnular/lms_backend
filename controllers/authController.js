@@ -30,9 +30,14 @@ exports.register = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findByEmail(work_email);
-    console.log("Database query result:", existingUser);
+    // Check if the emp_id already exists
+    const existingEmpId = await User.findByEmpId(emp_id);
+    if (existingEmpId) {
+      return res.status(400).json({ message: "Employee ID already exists" });
+    }
 
+    // Check if the work_email already exists
+    const existingUser = await User.findByEmail(work_email);
     if (existingUser) {
       return res.status(400).json({ message: "Work email already exists" });
     }
@@ -54,16 +59,15 @@ exports.register = async (req, res) => {
       role,
     };
 
-    console.log("User data to be inserted:", newUser);
-
     await User.create(newUser);
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     console.error("Registration error:", error);
-    res
-      .status(500)
-      .json({ message: "Error registering user", error: error.message });
+    res.status(500).json({
+      message: "Error registering user",
+      error: error.message,
+    });
   }
 };
 

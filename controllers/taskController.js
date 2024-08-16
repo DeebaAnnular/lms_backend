@@ -91,10 +91,11 @@ exports.getWeeklyData = async (req, res) => {
       day: task.day,
       task_id: task.task_id.split(",").map((id) => parseInt(id.trim(), 10)),
       task_name: task.task_name.split(",").map((name) => name.trim()),
+      task_time: task.task_time.split(",").map((time) => time.trim()), // Include task_time in the response
       total_hours_per_day: parseFloat(task.total_hours_per_day).toFixed(2),
       approved_status: task.approved_status,
       approved_by_name: task.approved_by_name,
-      reason: task.reason // Include the reject_reason in the response
+      reason: task.reason
     }));
 
     // Calculate the total hours
@@ -113,6 +114,7 @@ exports.getWeeklyData = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 // controllers/weeklyStatusController.js
 
 exports.createWeeklyStatus = async (req, res) => {
