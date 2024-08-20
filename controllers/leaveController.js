@@ -54,7 +54,7 @@ const { validateLeaveBalances } = require("../utils/validateLeaveType");
   };
   exports.createLeaveRequest = async (req, res) => {
     try {
-      const { user_id, from_date, to_date,session, total_days, leave_type } = req.body;
+      const { user_id, from_date, to_date, session, total_days, leave_type } = req.body;
   
       // Validate that all required fields are present
       if (!user_id || !from_date || !to_date || !total_days || !leave_type) {
@@ -67,25 +67,31 @@ const { validateLeaveBalances } = require("../utils/validateLeaveType");
         return res.status(404).json({ message: "User not found" });
       }
   
-      // Get current leave balance
-      const currentBalance = await EmployeeLeave.getCurrentLeaveBalance(user_id);
-      if (!currentBalance) {
-        return res.status(404).json({ message: "Current leave balance not found" });
+      // Define leave types that require balance check
+      const balanceCheckLeaveTypes = ['earned_leave', 'sick_leave', 'maternity_leave'];
+  
+      let newBalance;
+      if (balanceCheckLeaveTypes.includes(leave_type)) {
+        // Get current leave balance
+        const currentBalance = await EmployeeLeave.getCurrentLeaveBalance(user_id);
+        if (!currentBalance) {
+          return res.status(404).json({ message: "Current leave balance not found" });
+        }
+  
+        // Calculate new balance
+        newBalance = currentBalance[leave_type] - total_days;
+        if (newBalance < 0) {
+          return res.status(400).json({ message: "Insufficient leave balance" });
+        }
+  
+        // Prepare leave balance update
+        const leaveBalances = {
+          [leave_type]: newBalance
+        };
+  
+        // Update leave balance
+        await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
       }
-  
-      // Calculate new balance
-      const newBalance = currentBalance[leave_type] - total_days;
-      if (newBalance < 0) {
-        return res.status(400).json({ message: "Insufficient leave balance" });
-      }
-  
-      // Prepare leave balance update
-      const leaveBalances = {
-        [leave_type]: newBalance
-      };
-  
-      // Update leave balance
-      await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
   
       // Create the leave request using the user's data
       const leaveRequestId = await EmployeeLeave.createLeaveRequest(
@@ -109,7 +115,8 @@ const { validateLeaveBalances } = require("../utils/validateLeaveType");
           session,
           total_days,
           leave_type,
-          status: 'pending'
+          status: 'pending',
+          new_balance: balanceCheckLeaveTypes.includes(leave_type) ? newBalance : undefined
         }
       });
     } catch (error) {
