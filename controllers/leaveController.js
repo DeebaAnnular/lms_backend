@@ -98,12 +98,6 @@ exports.createLeaveRequest = async (req, res) => {
       if (newBalance < 0) {
         return res.status(400).json({ message: "Insufficient leave balance" });
       }
-
-      // Prepare leave balance update
-      const leaveBalances = { [leave_type]: newBalance };
-
-      // Update leave balance
-      await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
     }
 
     // Create the leave request using the user's data
@@ -115,8 +109,14 @@ exports.createLeaveRequest = async (req, res) => {
       session,
       total_days,
       leave_type,
-      reason // Pass the reason here
+      reason
     );
+
+    // Update leave balance only after the leave request is successfully created
+    if (balanceCheckLeaveTypes.includes(leave_type)) {
+      const leaveBalances = { [leave_type]: newBalance };
+      await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
+    }
 
     res.status(201).json({
       message: "Leave request created successfully",
@@ -129,7 +129,7 @@ exports.createLeaveRequest = async (req, res) => {
         session,
         total_days,
         leave_type,
-        reason, // Include reason in the response
+        reason,
         status: "pending",
         new_balance: balanceCheckLeaveTypes.includes(leave_type) ? newBalance : undefined,
       },

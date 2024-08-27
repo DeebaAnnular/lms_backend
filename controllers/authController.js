@@ -229,7 +229,6 @@ exports.updateUserDetails = async (req, res) => {
     // Ensure userId is treated as a number
     const userId = Number(req.params.userId);
 
-    console.log();
     const {
       emp_id,
       emp_name,
@@ -265,11 +264,12 @@ exports.updateUserDetails = async (req, res) => {
       role,
     };
 
-    const success = await User.updateUser(userId, updatedUser);
-    if (success) {
-      res.status(200).json({ message: "User details updated successfully" });
+    const result = await User.updateUser(userId, updatedUser);
+
+    if (result.success) {
+      res.status(200).json({ message: result.message });
     } else {
-      res.status(404).json({ message: "User not found or no changes made" });
+      res.status(400).json({ message: result.message });
     }
   } catch (error) {
     console.error("Error updating user details:", error);
