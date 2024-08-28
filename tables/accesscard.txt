@@ -1,0 +1,17 @@
+CREATE TABLE access_cards (
+    access_card_id INT AUTO_INCREMENT PRIMARY KEY,
+    card_type VARCHAR(50),
+    user_id INT,
+    emp_name VARCHAR(255),
+    emp_id VARCHAR(10),
+    designation VARCHAR(100),
+    job_type VARCHAR(50),
+    role VARCHAR(50),
+    access_card_number VARCHAR(50) UNIQUE,  
+    issue_date DATE, 
+    return_date DATE,
+    command VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
