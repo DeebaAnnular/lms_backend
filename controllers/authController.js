@@ -109,8 +109,9 @@ exports.login = async (req, res) => {
   const emp_name = user.empName;
   const emp_id = user.empId;
   const user_role = user.userRole;
+  const gender = user.gender;
 
-  res.json({ user_id, emp_name, emp_id, user_role, email, token });
+  res.json({ user_id, emp_name, emp_id, gender,user_role, email, token });
 };
 
 exports.forgetPassword = async (req, res) => {

@@ -59,84 +59,86 @@ exports.updateLeaveBalance = async (req, res) => {
 };
 exports.createLeaveRequest = async (req, res) => {
   try {
-    const { user_id, from_date, to_date, session, total_days, leave_type, reason } = req.body;
+      const { user_id, from_date, to_date, session, total_days, leave_type, reason } = req.body;
 
-    // Validate that all required fields are present
-    if (!user_id || !from_date || !to_date || !total_days || !leave_type) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Fetch the user data first
-    const user = await User.findById(user_id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if there is an existing leave request for the given date range
-    const leaveExists = await EmployeeLeave.checkExistingLeaveRequest(
-      user_id,
-      from_date,
-      to_date
-    );
-    if (leaveExists) {
-      return res.status(400).json({ message: "Leave request for this date range already exists" });
-    }
-
-    // Define leave types that require balance check
-    const balanceCheckLeaveTypes = ["earned_leave", "sick_leave", "maternity_leave", "optional_leave"];
-
-    let newBalance;
-    if (balanceCheckLeaveTypes.includes(leave_type)) {
-      // Get current leave balance
-      const currentBalance = await EmployeeLeave.getCurrentLeaveBalance(user_id);
-      if (!currentBalance) {
-        return res.status(404).json({ message: "Current leave balance not found" });
+      // Validate that all required fields are present
+      if (!user_id || !from_date || !to_date || !total_days || !leave_type || !session) {
+          return res.status(400).json({ message: "All fields are required" });
       }
 
-      // Calculate new balance
-      newBalance = currentBalance[leave_type] - total_days;
-      if (newBalance < 0) {
-        return res.status(400).json({ message: "Insufficient leave balance" });
+      // Fetch the user data first
+      const user = await User.findById(user_id);
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
       }
-    }
 
-    // Create the leave request using the user's data
-    const leaveRequestId = await EmployeeLeave.createLeaveRequest(
-      user_id,
-      user.emp_name,
-      from_date,
-      to_date,
-      session,
-      total_days,
-      leave_type,
-      reason
-    );
+      // Check for existing leave requests and handle conflicts
+      const { conflict, message } = await EmployeeLeave.checkExistingLeaveRequest(
+          user_id,
+          from_date,
+          to_date,
+          session
+      );
 
-    // Update leave balance only after the leave request is successfully created
-    if (balanceCheckLeaveTypes.includes(leave_type)) {
-      const leaveBalances = { [leave_type]: newBalance };
-      await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
-    }
+      if (conflict) {
+          return res.status(400).json({ message });
+      }
 
-    res.status(201).json({
-      message: "Leave request created successfully",
-      leaveRequestId,
-      leaveRequest: {
-        user_id,
-        emp_name: user.emp_name,
-        from_date,
-        to_date,
-        session,
-        total_days,
-        leave_type,
-        reason,
-        status: "pending",
-        new_balance: balanceCheckLeaveTypes.includes(leave_type) ? newBalance : undefined,
-      },
-    });
+      // Define leave types that require balance check
+      const balanceCheckLeaveTypes = ["earned_leave", "sick_leave", "maternity_leave", "optional_leave"];
+
+      let newBalance;
+      if (balanceCheckLeaveTypes.includes(leave_type)) {
+          // Get current leave balance
+          const currentBalance = await EmployeeLeave.getCurrentLeaveBalance(user_id);
+          if (!currentBalance) {
+              return res.status(404).json({ message: "Current leave balance not found" });
+          }
+
+          // Calculate new balance
+          newBalance = currentBalance[leave_type] - total_days;
+          if (newBalance < 0) {
+              return res.status(400).json({ message: "Insufficient leave balance" });
+          }
+      }
+
+      // Create the leave request using the user's data
+      const leaveRequestId = await EmployeeLeave.createLeaveRequest(
+          user_id,
+          user.emp_name,
+          from_date,
+          to_date,
+          session,
+          total_days,
+          leave_type,
+          reason
+      );
+
+      // Update leave balance only after the leave request is successfully created
+      if (balanceCheckLeaveTypes.includes(leave_type)) {
+          const leaveBalances = { [leave_type]: newBalance };
+          await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
+      }
+
+      res.status(201).json({
+          message: "Leave request created successfully",
+          leaveRequestId,
+          leaveRequest: {
+              user_id,
+              emp_name: user.emp_name,
+              from_date,
+              to_date,
+              session,
+              total_days,
+              leave_type,
+              reason,
+              status: "pending",
+              new_balance: balanceCheckLeaveTypes.includes(leave_type) ? newBalance : undefined,
+          },
+      });
   } catch (error) {
-    console.error("Error in createLeaveRequest controller:", error);
-    res.status(500).json({ message: "Error creating leave request", error: error.message });
+      console.error("Error in createLeaveRequest controller:", error);
+      res.status(500).json({ message: "Error creating leave request", error: error.message });
   }
 };
 
