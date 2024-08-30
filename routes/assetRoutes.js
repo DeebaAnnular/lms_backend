@@ -31,7 +31,7 @@ router.post("/return_asset_to_admin", returnAssetToAdmin);
 router.get("/get_all_assets_for_maintenance", getAllAssetsMaintenance);
 router.get("/get_asset_maintenance/:id", getAssetByIdMaintenance);
 router.post("/create_asset_for_maintenance", createAssetMaintenance);
-router.put("/update_asset_for_maintenance/:id", updateAssetMaintenance); // Fixed typo
-router.delete("/delete_asset_maintenance/:id", deleteAssetMaintenance); // Differentiated the delete route
+router.put("/update_asset_for_maintenance/:id", updateAssetMaintenance); 
+router.delete("/delete_asset_maintenance/:id", deleteAssetMaintenance); 
 
 module.exports = router;

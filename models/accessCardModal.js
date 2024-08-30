@@ -22,14 +22,13 @@ class AccessCard {
                 emp_name, 
                 emp_id, 
                 designation, 
-                job_type, 
                 role, 
                 access_card_number, 
                 issue_date, 
                 return_date, 
-                command
+                comments
             ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
         `;
         return db.execute(sql, [
             accessCard.card_type,
@@ -37,12 +36,11 @@ class AccessCard {
             accessCard.emp_name,
             accessCard.emp_id,
             accessCard.designation,
-            accessCard.job_type,
             accessCard.role,
             accessCard.access_card_number,
             accessCard.issue_date,
             accessCard.return_date,
-            accessCard.command
+            accessCard.comments
         ]);
     }
 
@@ -54,12 +52,11 @@ class AccessCard {
                 emp_name = ?, 
                 emp_id = ?, 
                 designation = ?, 
-                job_type = ?, 
                 role = ?, 
                 access_card_number = ?, 
                 issue_date = ?, 
                 return_date = ?, 
-                command = ?
+                comments = ?
             WHERE access_card_id = ?
         `;
         return db.execute(sql, [
@@ -67,12 +64,11 @@ class AccessCard {
             accessCard.emp_name,
             accessCard.emp_id,
             accessCard.designation,
-            accessCard.job_type,
             accessCard.role,
             accessCard.access_card_number,
             accessCard.issue_date,
             accessCard.return_date,
-            accessCard.command,
+            accessCard.comments,
             id
         ]);
     }
