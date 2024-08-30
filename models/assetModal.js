@@ -11,7 +11,7 @@ class Asset {
   
     static create(asset) {
       return db.execute(
-        `INSERT INTO assets (asset_no, asset_type, brand_name, device_serial_number, asset_status, ram, rom, processor, ostype, ms_office_installed, os_installed, purchase_date, purchase_cost, admin_configuration, operational_status, command, user_id) 
+        `INSERT INTO assets (asset_no, asset_type, brand_name, device_serial_number, asset_status, ram, rom, processor, ostype, ms_office_installed, os_installed, purchase_date, purchase_cost, admin_configuration, operational_status, comments, user_id) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           asset.asset_no,
@@ -29,7 +29,7 @@ class Asset {
           asset.purchase_cost,
           asset.admin_configuration,
           asset.operational_status,
-          asset.command,
+          asset.comments,
           asset.user_id
         ]
       );
@@ -72,7 +72,7 @@ class Asset {
           asset.purchase_cost,
           asset.admin_configuration,
           asset.operational_status,
-          asset.command,
+          asset.comments,
           asset.user_id,
           id
         ]

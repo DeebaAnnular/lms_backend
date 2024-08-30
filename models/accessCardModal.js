@@ -15,10 +15,9 @@ class AccessCard {
 
     // Create a new access card
     static create(accessCard) {
-        const sql = `
+        let sql = `
             INSERT INTO access_cards (
                 card_type, 
-                user_id,
                 emp_name, 
                 emp_id, 
                 designation, 
@@ -28,11 +27,11 @@ class AccessCard {
                 return_date, 
                 comments
             ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        return db.execute(sql, [
+        
+        let params = [
             accessCard.card_type,
-            accessCard.user_id,
             accessCard.emp_name,
             accessCard.emp_id,
             accessCard.designation,
@@ -41,9 +40,17 @@ class AccessCard {
             accessCard.issue_date,
             accessCard.return_date,
             accessCard.comments
-        ]);
+        ];
+    
+        // Add user_id to the query only if it's provided
+        if (accessCard.user_id) {
+            sql = sql.replace('INSERT INTO access_cards (', 'INSERT INTO access_cards (user_id, ');
+            sql = sql.replace('VALUES (', 'VALUES (?, ');
+            params.unshift(accessCard.user_id);
+        }
+    
+        return db.execute(sql, params);
     }
-
     // Update an access card
     static update(id, accessCard) {
         const sql = `

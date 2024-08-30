@@ -3,6 +3,11 @@ const AccessCard = require('../models/accessCardModal');
 // Create a new access card
 exports.createAccessCard = async (req, res) => {
     try {
+        // Check if emp_id is empty and user_id is not provided
+        if (!req.body.emp_id && !req.body.user_id) {
+            delete req.body.user_id; // Remove user_id from the request body
+        }
+
         const result = await AccessCard.create(req.body);
         res.status(201).json({ message: 'Access card created successfully' });
     } catch (error) {
@@ -13,6 +18,7 @@ exports.createAccessCard = async (req, res) => {
         }
     }
 };
+
 
 // Get all access cards
 exports.getAllAccessCards = async (req, res) => {
