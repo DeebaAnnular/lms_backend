@@ -36,7 +36,19 @@ class User {
     return null;
   }
 
-  static create(user) {
+  static async create(user) {
+    // Check if the contact number is already used
+    const [existingUsers] = await db.execute(
+      "SELECT * FROM users WHERE contact_number = ?",
+      [user.contact_number]
+    );
+    if (existingUsers.length > 0) {
+      throw new Error(
+        "Contact number already exists. Please use a unique number."
+      );
+    }
+
+    // Insert the new user
     console.log("Date being inserted:", user.date_of_joining);
     return db.execute(
       "INSERT INTO users (emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, role, work_email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -56,6 +68,21 @@ class User {
     );
   }
 
+  static async deleteUser(userId) {
+    try {
+      const query = "DELETE FROM users WHERE user_id = ?";
+      const [result] = await db.execute(query, [userId]);
+      if (result.affectedRows > 0) {
+        return { success: true, message: "Deleted Successfully." };
+      } else {
+        return { success: false, message: "User not found." };
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error;
+    }
+  }
+
   static updatePassword(work_email, newPassword) {
     return db.execute("UPDATE users SET password = ? WHERE work_email = ?", [
       newPassword,
@@ -68,6 +95,7 @@ class User {
       "SELECT user_id, emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, role, work_email, created_at, updated_at FROM users"
     );
   }
+
   static getUserDetailsById(userId) {
     return db.execute(
       "SELECT user_id, emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, role, work_email, created_at, updated_at FROM users WHERE user_id = ?",
@@ -94,6 +122,14 @@ class User {
       throw error;
     }
   }
+  static async findByContactNumber(contactNumber) {
+    const query = "SELECT * FROM users WHERE contact_number = ?";
+    const [rows] = await db.execute(query, [contactNumber]);
+    if (rows.length > 0) {
+      return rows[0];
+    }
+    return null;
+  }
 
   static async updateRole(userId, newRole) {
     const query = "UPDATE users SET role = ? WHERE user_id = ?";
@@ -111,22 +147,22 @@ class User {
       // Fetch the current emp_id for the user
       const currentEmpIdQuery = `SELECT emp_id FROM users WHERE user_id = ?`;
       const [currentEmpIdRows] = await db.execute(currentEmpIdQuery, [userId]);
-  
+
       if (currentEmpIdRows.length === 0) {
         return {
           success: false,
           message: "User not found.",
         };
       }
-  
+
       const currentEmpId = currentEmpIdRows[0].emp_id;
-  
+
       // Check if a new emp_id is provided and it's different from the current one
       if (userData.emp_id && userData.emp_id !== currentEmpId) {
         // Check if the new emp_id is already used by another user
         const checkQuery = `SELECT user_id FROM users WHERE emp_id = ? AND user_id != ?`;
         const [rows] = await db.execute(checkQuery, [userData.emp_id, userId]);
-  
+
         if (rows.length > 0) {
           return {
             success: false,
@@ -134,7 +170,7 @@ class User {
           };
         }
       }
-  
+
       // Proceed with the update
       const query = `
         UPDATE users
@@ -142,7 +178,7 @@ class User {
             work_location = ?, active_status = ?, designation = ?, role = ?, updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
       `;
-  
+
       const values = [
         userData.emp_id || currentEmpId, // Use current emp_id if not provided
         userData.emp_name,
@@ -155,7 +191,7 @@ class User {
         userData.role,
         userId,
       ];
-  
+
       const [result] = await db.execute(query, values);
       if (result.affectedRows > 0) {
         return { success: true, message: "User details updated successfully." };
@@ -170,7 +206,6 @@ class User {
       throw error;
     }
   }
-  
 }
 
 module.exports = User;

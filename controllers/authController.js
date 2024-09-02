@@ -42,6 +42,12 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Work email already exists" });
     }
 
+    // Check if the contact_number already exists
+    const existingContactNumber = await User.findByContactNumber(contact_number);
+    if (existingContactNumber) {
+      return res.status(400).json({ message: "Contact number already exists" });
+    }
+
     const hashedPassword = await hashPassword(password);
 
     const newUser = {
@@ -111,7 +117,7 @@ exports.login = async (req, res) => {
   const user_role = user.userRole;
   const gender = user.gender;
 
-  res.json({ user_id, emp_name, emp_id, gender,user_role, email, token });
+  res.json({ user_id, emp_name, emp_id, gender, user_role, email, token });
 };
 
 exports.forgetPassword = async (req, res) => {
@@ -227,7 +233,6 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUserDetails = async (req, res) => {
   try {
-    // Ensure userId is treated as a number
     const userId = Number(req.params.userId);
 
     const {
@@ -265,17 +270,31 @@ exports.updateUserDetails = async (req, res) => {
       role,
     };
 
-    const result = await User.updateUser(userId, updatedUser);
-
-    if (result.success) {
-      res.status(200).json({ message: result.message });
-    } else {
-      res.status(400).json({ message: result.message });
+    // Check if the contact_number already exists for another user
+    const existingContactNumber = await User.findByContactNumber(contact_number);
+    if (existingContactNumber && existingContactNumber.userId !== userId) {
+      return res.status(400).json({ message: "Contact number already exists" });
     }
+
+    await User.updateUserDetails(userId, updatedUser);
+    res.status(200).json({ message: "User details updated successfully" });
   } catch (error) {
     console.error("Error updating user details:", error);
     res
       .status(500)
       .json({ message: "Error updating user details", error: error.message });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    await User.deleteUser(userId);
+    res.status(200).json({ message: "Deleted Successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res
+      .status(500)
+      .json({ message: "Error deleting user", error: error.message });
   }
 };
