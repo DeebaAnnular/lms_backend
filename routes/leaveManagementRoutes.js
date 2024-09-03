@@ -5,7 +5,8 @@ const {
   createLeaveRequest,
   getPendingLeaveRequests,
   approveOrRejectLeave,
-  getLeaveHistory 
+  getLeaveHistory,
+  getAllApprovedAndRejectedRequests
 } = require("../controllers/leaveController");
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.post("/request-leave", createLeaveRequest); /*done */
 router.get("/get-all-leave-request", getPendingLeaveRequests);  /*done */
 router.put("/update-leave-status", approveOrRejectLeave);
 router.get('/leave-history/:userId', getLeaveHistory); /*done */
+router.get('/get_all_rejected_and_approved_list',getAllApprovedAndRejectedRequests)
 
 module.exports = router;

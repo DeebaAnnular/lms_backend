@@ -395,6 +395,41 @@ class EmployeeLeave {
       throw error;
     }
   }
+
+
+  static async getAllApprovedAndRejectedRequests() {
+    const query = `
+      SELECT 
+        lr.leave_request_id, 
+        lr.user_id, 
+        u.emp_id, 
+        lr.emp_name, 
+        lr.from_date, 
+        lr.to_date, 
+        lr.total_days, 
+        lr.leave_type, 
+        lr.status, 
+        lr.reason, 
+        lr.created_at, 
+        lr.updated_at 
+      FROM 
+        leave_requests lr
+      INNER JOIN 
+        users u 
+      ON 
+        lr.user_id = u.user_id
+      WHERE 
+        lr.status IN ('rejected', 'approved')
+    `;
+
+    try {
+      const [rows] = await db.execute(query);
+      return rows;
+    } catch (error) {
+      console.error("Error in getAllRejectedAndApprovedRequests:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = EmployeeLeave;
