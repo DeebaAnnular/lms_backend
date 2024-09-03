@@ -280,7 +280,7 @@ class EmployeeLeave {
 
             // Case 4: Applying full day when a half-day already exists
             if (session === 'full_day' && existingLeaves.length > 0) {
-                return { conflict: true, message: "leave already exists for this date. Cannot apply leave." };
+                return { conflict: true, message: "Leave already exists for this date. Cannot apply leave." };
             }
         }
 
