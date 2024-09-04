@@ -142,7 +142,7 @@ class User {
     }
   }
 
-  static async updateUser(userId, userData) {
+  static async updateUserDetails(userId, userData) {
     try {
       // Fetch the current emp_id for the user
       const currentEmpIdQuery = `SELECT emp_id FROM users WHERE user_id = ?`;
