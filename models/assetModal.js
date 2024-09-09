@@ -20,7 +20,7 @@ class Asset {
                 asset.asset_type || null,
                 asset.brand_name || null,
                 asset.device_serial_number || null,
-                asset.asset_status || null,
+                asset.asset_status,
                 asset.ram || null,
                 asset.rom || null,
                 asset.processor || null,
@@ -61,7 +61,7 @@ class Asset {
                 asset.asset_type || null,
                 asset.brand_name || null,
                 asset.device_serial_number || null,
-                asset.asset_status || null,
+                asset.asset_status,
                 asset.ram || null,
                 asset.rom || null,
                 asset.processor || null,
@@ -96,7 +96,7 @@ class Asset {
                 empName || null,
                 empId || null,
                 issueDate || null,
-                assetStatus || null,
+                assetStatus,
                 assetId
             ]
         );
@@ -116,7 +116,7 @@ class Asset {
                 empName || null,
                 empId || null,
                 returnDate || null,
-                assetStatus || null,
+                assetStatus,
                 assetId
             ]
         );
