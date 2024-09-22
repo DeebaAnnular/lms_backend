@@ -248,32 +248,41 @@ exports.updateUserDetails = async (req, res) => {
     } = req.body;
 
     // Validate and format date
-    let formattedDate = req.body.date_of_joining;
-    if (date_of_joining.match(/^\d{2}-\d{2}-\d{4}$/)) {
+    let formattedDate = date_of_joining;
+    if (date_of_joining && date_of_joining.match(/^\d{2}-\d{2}-\d{4}$/)) {
       const [day, month, year] = date_of_joining.split("-");
       formattedDate = `${year}-${month}-${day}`;
-    } else if (!date_of_joining.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    } else if (date_of_joining && !date_of_joining.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return res.status(400).json({
         message: "Invalid date format. Use YYYY-MM-DD or DD-MM-YYYY.",
       });
     }
 
+    // Get the current user details
+    const [currentUser] = await User.getUserDetailsById(userId);
+    if (!currentUser || currentUser.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const updatedUser = {
-      emp_id,
-      emp_name,
-      gender,
-      date_of_joining: formattedDate,
-      contact_number,
-      work_location,
-      active_status: Number(active_status),
-      designation,
-      role,
+      emp_id: emp_id || currentUser[0].emp_id,
+      emp_name: emp_name || currentUser[0].emp_name,
+      gender: gender || currentUser[0].gender,
+      date_of_joining: formattedDate || currentUser[0].date_of_joining,
+      contact_number: contact_number || currentUser[0].contact_number,
+      work_location: work_location || currentUser[0].work_location,
+      active_status: active_status !== undefined ? Number(active_status) : currentUser[0].active_status,
+      designation: designation || currentUser[0].designation,
+      role: role || currentUser[0].role,
     };
 
-    // Check if the contact_number already exists for another user
-    const existingContactNumber = await User.findByContactNumber(contact_number);
-    if (existingContactNumber && existingContactNumber.userId !== userId) {
-      return res.status(400).json({ message: "Contact number already exists" });
+    // Check if the contact_number has changed
+    if (contact_number && contact_number !== currentUser[0].contact_number) {
+      // Check if the new contact_number already exists for another user
+      const existingContactNumber = await User.findByContactNumber(contact_number);
+      if (existingContactNumber && existingContactNumber.userId !== userId) {
+        return res.status(400).json({ message: "Contact number already exists for another user" });
+      }
     }
 
     await User.updateUserDetails(userId, updatedUser);

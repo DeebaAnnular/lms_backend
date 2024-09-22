@@ -14,15 +14,16 @@ class AssetMaintenance {
 
   static create(assetMaintenance) {
     return db.execute(
-      `INSERT INTO asset_maintenance (asset_no, issue_description, service_cost, service_outdate, service_indate,comments) 
-      VALUES (?, ?, ?, ?, ?,?)`,
+      `INSERT INTO asset_maintenance (asset_no, issue_description, service_cost, service_outdate, service_indate,comments,emp_name) 
+      VALUES (?, ?, ?, ?, ?,?,?)`,
       [
-        assetMaintenance.asset_no,
-        assetMaintenance.issue_description,
-        assetMaintenance.service_cost,
-        assetMaintenance.service_outdate,
-        assetMaintenance.service_indate,
-        assetMaintenance.comments,
+        assetMaintenance.asset_no || null ,
+        assetMaintenance.issue_description || null,
+        assetMaintenance.service_cost || null,
+        assetMaintenance.service_outdate || null,
+        assetMaintenance.service_indate || null,
+        assetMaintenance.comments || null,
+        assetMaintenance.emp_name || null,
       ]
     );
   }
@@ -36,14 +37,16 @@ class AssetMaintenance {
       service_outdate = ?, 
       service_indate = ? ,
       comments = ?,
+      emp_name = ?
       WHERE asset_service_id = ?`,
       [
-        assetMaintenance.asset_no,
-        assetMaintenance.issue_description,
-        assetMaintenance.service_cost,
-        assetMaintenance.service_outdate,
-        assetMaintenance.service_indate,
-        assetMaintenance.comments,
+        assetMaintenance.asset_no || null,
+        assetMaintenance.issue_description || null,
+        assetMaintenance.service_cost || null,
+        assetMaintenance.service_outdate || null,
+        assetMaintenance.service_indate || null,
+        assetMaintenance.comments || null,
+        assetMaintenance.emp_name || null,
         id,
       ]
     );

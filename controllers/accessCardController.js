@@ -1,4 +1,4 @@
-const AccessCard = require('../models/accessCardModal'); 
+const AccessCard = require('../models/accessCardModal');
 
 // Create a new access card
 exports.createAccessCard = async (req, res) => {
@@ -12,13 +12,12 @@ exports.createAccessCard = async (req, res) => {
         res.status(201).json({ message: 'Access card created successfully' });
     } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
-            res.status(400).json({ error: 'Access card number already exists' });
+            res.status(400).json({ error: 'Access card number already exists, please use a unique number.' });
         } else {
             res.status(500).json({ error: error.message });
         }
     }
 };
-
 
 // Get all access cards
 exports.getAllAccessCards = async (req, res) => {
@@ -54,7 +53,11 @@ exports.updateAccessCard = async (req, res) => {
             res.status(404).json({ message: 'Access card not found' });
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        if (error.code === 'ER_DUP_ENTRY') {
+            res.status(400).json({ error: 'Access card number already exists, please use a unique number.' });
+        } else {
+            res.status(500).json({ error: error.message });
+        }
     }
 };
 
@@ -71,3 +74,24 @@ exports.deleteAccessCard = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Return an access card (set access_cards_status to 0 and set return_date)
+exports.returnAccessCard = async (req, res) => {
+    try {
+        const { return_date } = req.body;
+
+        // Validate if the return_date is provided in the request body
+        if (!return_date) {
+            return res.status(400).json({ error: 'Return date is required' });
+        }
+
+        const result = await AccessCard.returnAccessCard(req.params.id, return_date);
+        if (result[0].affectedRows > 0) {
+            res.status(200).json({ message: 'Access card returned successfully' });
+        } else {
+            res.status(404).json({ message: 'Access card not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}

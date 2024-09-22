@@ -24,22 +24,22 @@ class AccessCard {
                 role, 
                 access_card_number, 
                 issue_date, 
-                return_date, 
-                comments
+                comments,
+                access_cards_status
             ) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         
         let params = [
-            accessCard.card_type,
-            accessCard.emp_name,
-            accessCard.emp_id,
-            accessCard.designation,
-            accessCard.role,
-            accessCard.access_card_number,
-            accessCard.issue_date,
-            accessCard.return_date,
-            accessCard.comments
+            accessCard.card_type || null, // Default to null if undefined
+            accessCard.emp_name || null,
+            accessCard.emp_id || null,
+            accessCard.designation || null,
+            accessCard.role || null,
+            accessCard.access_card_number || null,
+            accessCard.issue_date || null,
+            accessCard.comments || null,
+            1 // Default status
         ];
     
         // Add user_id to the query only if it's provided
@@ -63,7 +63,8 @@ class AccessCard {
                 access_card_number = ?, 
                 issue_date = ?, 
                 return_date = ?, 
-                comments = ?
+                comments = ?, 
+                access_cards_status = ? 
             WHERE access_card_id = ?
         `;
         return db.execute(sql, [
@@ -74,8 +75,9 @@ class AccessCard {
             accessCard.role,
             accessCard.access_card_number,
             accessCard.issue_date,
-            accessCard.return_date,
+            accessCard.return_date || null,
             accessCard.comments,
+            accessCard.access_cards_status,
             id
         ]);
     }
@@ -85,6 +87,17 @@ class AccessCard {
         const sql = 'DELETE FROM access_cards WHERE access_card_id = ?';
         return db.execute(sql, [id]);
     }
+
+    // Return an access card (update access_cards_status to 0 and set return_date)
+    static returnAccessCard(id, returnDate) {
+        const sql = `
+            UPDATE access_cards SET 
+                access_cards_status = 0, 
+                return_date = ? 
+            WHERE access_card_id = ?
+        `;
+        return db.execute(sql, [returnDate, id]);
+    }
 }
 
 module.exports = AccessCard;
