@@ -5,6 +5,11 @@ const tasksRoutes = require("./routes/taskRoutes");
 const holidayRoutes = require("./routes/holidayRoutes");
 const assetRoutes = require("./routes/assetRoutes");
 const accessCardRoute = require("./routes/accessCardRoutes");
+const roleManagementRoutes = require("./routes/roleMagementRoutes.js");
+const {
+  checkForUnupdatedTasks,
+} = require("./cronJobs/checkForUnupdatedTasks.js");
+
 const fs = require("fs");
 const cors = require("cors");
 
@@ -37,6 +42,7 @@ app.use("/api/task", tasksRoutes);
 app.use("/api/holiday", holidayRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/access_card", accessCardRoute);
+app.use("/api/role", roleManagementRoutes);
 
 const PORT = process.env.PORT || 3000;
 
@@ -47,8 +53,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
 
 // const express = require("express");
 // const authRoutes = require("./routes/authRoutes");

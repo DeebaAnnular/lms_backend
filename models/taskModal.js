@@ -30,18 +30,18 @@ class EmployeeTask {
         `SELECT approved_status FROM tasks WHERE task_id = ?`,
         [id]
       );
-  
+
       if (checkRows.length === 0) {
-        throw new Error('Task not found');
+        throw new Error("Task not found");
       }
-  
+
       const currentStatus = checkRows[0].approved_status;
-  
+
       // If the task is already approved, do not allow updates
-      if (currentStatus === 'approved') {
-        throw new Error('Task is already approved and cannot be updated');
+      if (currentStatus === "approved") {
+        throw new Error("Task is already approved and cannot be updated");
       }
-  
+
       // Update the task including the approved_status if provided
       const [rows] = await db.query(
         `UPDATE tasks 
@@ -49,15 +49,15 @@ class EmployeeTask {
              approved_status = ?, updated_at = NOW() 
          WHERE task_id = ?`,
         [
-          task.task_name, 
-          task.task_time, 
-          task.task_date, 
-          task.user_id, 
+          task.task_name,
+          task.task_time,
+          task.task_date,
+          task.user_id,
           task.approved_status || currentStatus, // Use the new approved_status if provided, otherwise keep the current one
-          id
+          id,
         ]
       );
-  
+
       return rows;
     } catch (error) {
       console.error("Error in updateTask:", error);
@@ -93,8 +93,8 @@ class EmployeeTask {
         ORDER BY 
           task_date
       `;
-     
-      const [results] = await db.query(query, [userId, fromDate, toDate]);    
+
+      const [results] = await db.query(query, [userId, fromDate, toDate]);
       return results;
     } catch (error) {
       console.error("Error in getWeeklyData:", error);
@@ -133,7 +133,7 @@ class EmployeeTask {
   static async getWeeklyStatusByUserId(userId) {
     try {
       const query = "SELECT * FROM weekly_status WHERE user_id = ?";
-  
+
       const [results] = await db.query(query, [userId]);
       return results; // Return all results for the user
     } catch (error) {
@@ -142,7 +142,11 @@ class EmployeeTask {
     }
   }
 
-  static updateApprovalStatus = async (approvedStatus, approvedById, taskIds) => {
+  static updateApprovalStatus = async (
+    approvedStatus,
+    approvedById,
+    taskIds
+  ) => {
     try {
       const query = `
         UPDATE tasks
@@ -152,8 +156,12 @@ class EmployeeTask {
         WHERE 
           task_id IN (?)
       `;
-      
-      const [results] = await db.query(query, [approvedStatus, approvedById, taskIds]);
+
+      const [results] = await db.query(query, [
+        approvedStatus,
+        approvedById,
+        taskIds,
+      ]);
       return results;
     } catch (error) {
       console.error("Error in updateApprovalStatus:", error);
@@ -161,7 +169,12 @@ class EmployeeTask {
     }
   };
 
-  static updateRejectStatus = async (rejectedStatus, rejectedById, rejectReason, taskIds) => {
+  static updateRejectStatus = async (
+    rejectedStatus,
+    rejectedById,
+    rejectReason,
+    taskIds
+  ) => {
     try {
       const query = `
         UPDATE tasks
@@ -172,8 +185,13 @@ class EmployeeTask {
         WHERE 
           task_id IN (?)
       `;
-      
-      const [results] = await db.query(query, [rejectedStatus, rejectedById, rejectReason, taskIds]);
+
+      const [results] = await db.query(query, [
+        rejectedStatus,
+        rejectedById,
+        rejectReason,
+        taskIds,
+      ]);
       return results;
     } catch (error) {
       console.error("Error in updateRejectStatus:", error);
@@ -195,5 +213,24 @@ class EmployeeTask {
       throw error;
     }
   }
+
+  // New method to get tasks by userId and date range
+  static getTasksByUserIdAndDates = async (userId, dates) => {
+    try {
+      const query = `
+        SELECT * 
+        FROM tasks 
+        WHERE user_id = ? 
+        AND task_date BETWEEN ? AND ?
+      `;
+
+      const [rows] = await db.query(query, [userId, dates[0], dates[1]]);
+      return rows; // Return the result
+    } catch (error) {
+      console.error("Error in getTasksByUserIdAndDates:", error);
+      throw error;
+    }
+  };
 }
+
 module.exports = EmployeeTask;
