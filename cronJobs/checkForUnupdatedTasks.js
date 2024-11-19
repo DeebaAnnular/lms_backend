@@ -117,8 +117,13 @@ const checkForUnupdatedTasks = async () => {
   }
 };
 
+// // Schedule the job to run every minute (for testing purposes)
+// cron.schedule("*/1 * * * *", () => {
+//   console.log("Checking for unupdated tasks...");
+//   checkForUnupdatedTasks();
+// });
 // Schedule the job to run every minute (for testing purposes)
-cron.schedule("*/1 * * * *", () => {
-  console.log("Checking for unupdated tasks...");
-  checkForUnupdatedTasks();
-});
+// cron.schedule("*/1 * * * *", () => {
+//   console.log("Checking for unupdated tasks...");
+//   checkForUnupdatedTasks();
+// });
