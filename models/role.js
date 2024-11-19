@@ -32,10 +32,10 @@ class Role {
   // Create a new role
   static async createRole(role) {
     const query = `
-            INSERT INTO roleManagement 
-            (roleName, apply, edit, deleteRole, approve, designation, salary, isActive, createdBy, createdOn, updatedBy, updatedOn) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+      INSERT INTO roleManagement 
+      (roleName, apply, edit, deleteRole, approve, designation, salary, isActive, createdBy, createdOn, updatedBy, updatedOn) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
     const values = [
       role.roleName,
       role.apply,
