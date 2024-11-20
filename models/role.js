@@ -66,16 +66,22 @@ class Role {
     }
   }
 
+  // Get all roles
   static async getAllRoles() {
     const query = `SELECT * FROM roleManagement`;
 
     try {
-      const [rows] = await db.query(query); // No need for db.promise() anymore
+      // Query the database and ensure to get the rows
+      const [rows] = await db.query(query); // This is for mysql2 and similar libraries
+
+      // Log the rows to inspect the raw data
       console.log("Database rows:", rows);
+
+      // Ensure we're returning the rows (actual data) and not some metadata
       return rows;
     } catch (error) {
       console.error("Error fetching roles:", error);
-      throw error;
+      throw error; // Throw error to be handled in the controller
     }
   }
 

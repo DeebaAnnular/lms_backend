@@ -35,9 +35,7 @@ const sendEmailNotification = (userEmail, missingDays) => {
     from: "benishabeni21@gmail.com", // Sender email
     to: userEmail, // Send to this email
     subject: "Task Update Reminder",
-    text: `You haven't updated your tasks for the following days in the last 5 working days (Monday to Friday): ${formattedDays.join(
-      ", "
-    )}. Please ensure all tasks are saved.`,
+    text: `You haven't updated your tasks for the following days in the last 5 working days (Monday to Friday): Please ensure all tasks are saved.`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -122,8 +120,8 @@ const checkForUnupdatedTasks = async () => {
 //   console.log("Checking for unupdated tasks...");
 //   checkForUnupdatedTasks();
 // });
-// Schedule the job to run every minute (for testing purposes)
-// cron.schedule("*/1 * * * *", () => {
-//   console.log("Checking for unupdated tasks...");
-//   checkForUnupdatedTasks();
-// });
+// Schedule the job to run every Sunday at 12 PM
+cron.schedule("0 12 * * SUN", () => {
+  console.log("Checking for unupdated tasks...");
+  checkForUnupdatedTasks();
+});

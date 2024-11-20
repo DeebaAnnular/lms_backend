@@ -1,3 +1,4 @@
+const db = require("../config/db");
 const { format } = require("date-fns");
 const Role = require("../models/role"); // Import the Role model
 

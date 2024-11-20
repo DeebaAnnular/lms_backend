@@ -1,3 +1,4 @@
+const nodemailer = require("nodemailer");
 const EmployeeLeave = require("../models/leaveModal");
 const User = require("../models/userModel");
 const { validateLeaveBalances } = require("../utils/validateLeaveType");
@@ -55,6 +56,50 @@ exports.updateLeaveBalance = async (req, res) => {
       .json({ message: "Error updating leave balance", error: error.message });
   }
 };
+// Email configuration
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  auth: {
+    user: "benishabeni21@gmail.com", // Sender email
+    pass: "xhdj ysor pzul otkj", // Use app password or email password
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
+// Send leave request email
+const sendLeaveRequestEmail = async (email, leaveRequestDetails) => {
+  if (!email) {
+    console.error("No email provided");
+    return; // Skip sending email if no recipient email is provided
+  }
+
+  const mailOptions = {
+    from: "benishabeni21@gmail.com", // Sender address
+    to: email, // Receiver's email address
+    subject: "Leave Request Created Successfully", // Subject line
+    text: `Your leave request has been successfully created:
+    \n\nLeave Type: ${leaveRequestDetails.leave_type}
+    \nFrom Date: ${leaveRequestDetails.from_date}
+    \nTo Date: ${leaveRequestDetails.to_date}
+    \nTotal Days: ${leaveRequestDetails.total_days}
+    \nSession: ${leaveRequestDetails.session}
+    \nReason: ${leaveRequestDetails.reason}
+    \nStatus: Pending
+    \n\nThank you.`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Leave request email sent successfully");
+  } catch (error) {
+    console.error("Error sending leave request email:", error);
+  }
+};
+
+// Apply for leave
 exports.createLeaveRequest = async (req, res) => {
   try {
     const {
@@ -83,6 +128,18 @@ exports.createLeaveRequest = async (req, res) => {
     const user = await User.findById(user_id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if email exists
+    if (!user.work_emailemail) {
+      return res.status(400).json({ message: "User email not found" });
+    }
+
+    // Check if leave dates are valid (e.g., from_date should not be after to_date)
+    if (new Date(from_date) > new Date(to_date)) {
+      return res
+        .status(400)
+        .json({ message: "From date cannot be after to date" });
     }
 
     // Check for existing leave requests and handle conflicts
@@ -142,6 +199,17 @@ exports.createLeaveRequest = async (req, res) => {
       await EmployeeLeave.updateLeaveBalance(user_id, leaveBalances);
     }
 
+    // Send the leave request email after the request is successfully created
+    await sendLeaveRequestEmail(user.work_email, {
+      leave_type,
+      from_date,
+      to_date,
+      total_days,
+      session,
+      reason,
+    });
+
+    // Respond with the leave request details
     res.status(201).json({
       message: "Leave request created successfully",
       leaveRequestId,
@@ -180,17 +248,10 @@ exports.getPendingLeaveRequests = async (req, res) => {
   }
 };
 
+// Updated approveOrRejectLeave method
 exports.approveOrRejectLeave = async (req, res) => {
   try {
     const { leave_request_id, status, reason } = req.body;
-
-    console.log(
-      "leave_request_id:",
-      leave_request_id,
-      "type:",
-      typeof leave_request_id
-    );
-    console.log("status:", status, "type:", typeof status);
 
     // Ensure leave_request_id is a number
     const requestId = parseInt(leave_request_id, 10);
@@ -230,8 +291,6 @@ exports.approveOrRejectLeave = async (req, res) => {
         parseFloat(currentBalance[leaveRequest.leave_type]) +
         parseFloat(leaveRequest.total_days);
 
-      console.log("new balance: ", typeof newBalance);
-
       // Prepare leave balance update
       const leaveBalances = {
         [leaveRequest.leave_type]: newBalance,
@@ -244,6 +303,19 @@ exports.approveOrRejectLeave = async (req, res) => {
       );
     }
 
+    // Send email notification for approval or rejection
+    const user = await User.findById(leaveRequest.user_id);
+    if (user && user.work_email) {
+      await sendLeaveApprovalOrRejectionEmail(
+        user.work_email,
+        leaveRequest,
+        status,
+        reason
+      );
+    } else {
+      console.warn("User email not found; skipping email notification.");
+    }
+
     res.json({ message: `Leave request ${status} successfully` });
   } catch (error) {
     console.error("Error in approveOrRejectLeave:", error);
@@ -253,7 +325,55 @@ exports.approveOrRejectLeave = async (req, res) => {
     });
   }
 };
+// Email function to notify about leave approval or rejection
+const sendLeaveApprovalOrRejectionEmail = async (
+  email,
+  leaveRequestDetails,
+  status,
+  reason = ""
+) => {
+  if (!email) {
+    console.error("No email provided");
+    return; // Skip sending email if no recipient email is provided
+  }
 
+  const subject =
+    status === "approved"
+      ? "Your Leave Request has been Approved"
+      : "Your Leave Request has been Rejected";
+
+  const text =
+    status === "approved"
+      ? `Congratulations! Your leave request has been approved:
+      \n\nLeave Type: ${leaveRequestDetails.leave_type}
+      \nFrom Date: ${leaveRequestDetails.from_date}
+      \nTo Date: ${leaveRequestDetails.to_date}
+      \nTotal Days: ${leaveRequestDetails.total_days}
+      \nSession: ${leaveRequestDetails.session}
+      \n\nEnjoy your leave!`
+      : `Unfortunately, your leave request has been rejected:
+      \n\nLeave Type: ${leaveRequestDetails.leave_type}
+      \nFrom Date: ${leaveRequestDetails.from_date}
+      \nTo Date: ${leaveRequestDetails.to_date}
+      \nTotal Days: ${leaveRequestDetails.total_days}
+      \nSession: ${leaveRequestDetails.session}
+      \nReason for Rejection: ${reason}
+      \n\nPlease contact your manager for more information.`;
+
+  const mailOptions = {
+    from: "benishabeni21@gmail.com", // Sender address
+    to: email, // Receiver's email address
+    subject,
+    text,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Leave approval/rejection email sent successfully");
+  } catch (error) {
+    console.error("Error sending approval/rejection email:", error);
+  }
+};
 exports.getLeaveHistory = async (req, res) => {
   try {
     // Parse userId from request parameters
