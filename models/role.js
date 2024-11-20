@@ -66,6 +66,19 @@ class Role {
     }
   }
 
+  static async getAllRoles() {
+    const query = `SELECT * FROM roleManagement`;
+
+    try {
+      const [rows] = await db.query(query); // No need for db.promise() anymore
+      console.log("Database rows:", rows);
+      return rows;
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      throw error;
+    }
+  }
+
   // Get a role by roleName
   static async getRoleByName(roleName) {
     const query = `SELECT * FROM roleManagement WHERE roleName = ?`;
