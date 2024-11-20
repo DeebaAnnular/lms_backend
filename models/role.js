@@ -29,7 +29,6 @@ class Role {
     this.updatedOn = updatedOn;
   }
 
-  // Create a new role
   static async createRole(role) {
     const query = `
       INSERT INTO roleManagement 
@@ -51,25 +50,19 @@ class Role {
       role.updatedOn,
     ];
 
-    return db.query(query, values);
-  }
-
-  // Get all roles
-  static async getAllRoles() {
-    const query = `SELECT * FROM roleManagement`;
-
     try {
-      // Query the database and ensure to get the rows
-      const [rows] = await db.query(query); // This is for mysql2 and similar libraries
-
-      // Log the rows to inspect the raw data
-      console.log("Database rows:", rows);
-
-      // Ensure we're returning the rows (actual data) and not some metadata
-      return rows;
+      const [result] = await db.query(query, values);
+      if (result.affectedRows === 0) {
+        return { success: false, message: "Failed to create role." };
+      }
+      return { success: true, message: "Role created successfully." };
     } catch (error) {
-      console.error("Error fetching roles:", error);
-      throw error; // Throw error to be handled in the controller
+      console.error("Error creating role:", error);
+      return {
+        success: false,
+        message: "An error occurred while creating the role.",
+        error: error.message,
+      };
     }
   }
 
