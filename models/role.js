@@ -1,34 +1,6 @@
 const db = require("../config/db");
 
 class Role {
-  constructor(
-    roleName,
-    apply,
-    edit,
-    deleteRole,
-    approve,
-    designation,
-    salary,
-    isActive,
-    createdBy,
-    createdOn,
-    updatedBy,
-    updatedOn
-  ) {
-    this.roleName = roleName;
-    this.apply = apply;
-    this.edit = edit;
-    this.deleteRole = deleteRole;
-    this.approve = approve;
-    this.designation = designation;
-    this.salary = salary;
-    this.isActive = isActive;
-    this.createdBy = createdBy;
-    this.createdOn = createdOn;
-    this.updatedBy = updatedBy;
-    this.updatedOn = updatedOn;
-  }
-
   static async createRole(role) {
     const query = `
       INSERT INTO roleManagement 
@@ -50,20 +22,7 @@ class Role {
       role.updatedOn,
     ];
 
-    try {
-      const [result] = await db.query(query, values);
-      if (result.affectedRows === 0) {
-        return { success: false, message: "Failed to create role." };
-      }
-      return { success: true, message: "Role created successfully." };
-    } catch (error) {
-      console.error("Error creating role:", error);
-      return {
-        success: false,
-        message: "An error occurred while creating the role.",
-        error: error.message,
-      };
-    }
+    return db.query(query, values);
   }
 
   // Get all roles

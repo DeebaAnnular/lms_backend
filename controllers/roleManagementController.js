@@ -1,4 +1,3 @@
-const db = require("../config/db");
 const { format } = require("date-fns");
 const Role = require("../models/role"); // Import the Role model
 
@@ -26,8 +25,8 @@ exports.createRoleManagement = async (req, res) => {
     });
   }
 
-  // Create a new Role object
-  const newRole = new Role({
+  // Create a new role object
+  const newRole = {
     roleName,
     apply,
     edit,
@@ -40,7 +39,7 @@ exports.createRoleManagement = async (req, res) => {
     createdOn,
     updatedBy,
     updatedOn,
-  });
+  };
 
   try {
     // Call the createRole method from the Role model to insert the role into the database
