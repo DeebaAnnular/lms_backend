@@ -223,6 +223,7 @@ exports.getUserById = async (req, res) => {
       work_email: rows[0].work_email,
       created_at: rows[0].created_at,
       updated_at: rows[0].updated_at,
+      roleId: rows[0].roleId,
     };
 
     res.status(200).json(user);
