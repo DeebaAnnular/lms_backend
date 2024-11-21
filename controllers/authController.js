@@ -247,7 +247,7 @@ exports.updateUserDetails = async (req, res) => {
       work_location,
       active_status,
       designation,
-      role,
+      roleId, // Corrected to use roleId
     } = req.body;
 
     // Validate and format date
@@ -270,6 +270,7 @@ exports.updateUserDetails = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Prepare updated user data
     const updatedUser = {
       emp_id: emp_id || currentUser[0].emp_id,
       emp_name: emp_name || currentUser[0].emp_name,
@@ -282,7 +283,7 @@ exports.updateUserDetails = async (req, res) => {
           ? Number(active_status)
           : currentUser[0].active_status,
       designation: designation || currentUser[0].designation,
-      role: role || currentUser[0].role,
+      roleId: roleId || currentUser[0].roleId, // Corrected to use roleId
     };
 
     // Check if the contact_number has changed
@@ -298,8 +299,15 @@ exports.updateUserDetails = async (req, res) => {
       }
     }
 
-    await User.updateUserDetails(userId, updatedUser);
-    res.status(200).json({ message: "User details updated successfully" });
+    // Update user details in the database
+    const updateResult = await User.updateUserDetails(userId, updatedUser);
+    if (updateResult.success) {
+      return res
+        .status(200)
+        .json({ message: "User details updated successfully" });
+    } else {
+      return res.status(400).json({ message: updateResult.message });
+    }
   } catch (error) {
     console.error("Error updating user details:", error);
     res

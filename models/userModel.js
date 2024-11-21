@@ -98,7 +98,7 @@ class User {
 
   static getUserDetailsById(userId) {
     return db.execute(
-      "SELECT user_id, emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, role, work_email, created_at, updated_at FROM users WHERE user_id = ?",
+      "SELECT user_id, emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, roleId, work_email, created_at, updated_at FROM users WHERE user_id = ?",
       [userId]
     );
   }
@@ -175,7 +175,7 @@ class User {
       const query = `
         UPDATE users
         SET emp_id = ?, emp_name = ?, gender = ?, date_of_joining = ?, contact_number = ?,
-            work_location = ?, active_status = ?, designation = ?, role = ?, updated_at = CURRENT_TIMESTAMP
+            work_location = ?, active_status = ?, designation = ?, roleId = ?, updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
       `;
 
@@ -188,7 +188,7 @@ class User {
         userData.work_location,
         userData.active_status,
         userData.designation,
-        userData.role,
+        userData.roleId,
         userId,
       ];
 
@@ -207,5 +207,4 @@ class User {
     }
   }
 }
-
 module.exports = User;
