@@ -2,7 +2,7 @@ const { format } = require("date-fns");
 const Role = require("../models/role"); // Import the Role model
 
 // Controller to create a new role
-exports.createRoleManagement = async (req, res) => {
+const createRoleHandler = async (req, res) => {
   const {
     roleName,
     apply,
@@ -17,13 +17,6 @@ exports.createRoleManagement = async (req, res) => {
     updatedBy,
     updatedOn,
   } = req.body;
-
-  // Validate the required fields
-  // if (!roleName || !designation) {
-  //   return res.status(400).json({
-  //     message: "Role name and designation are required.",
-  //   });
-  // }
 
   // Create a new role object
   const newRole = {
@@ -52,8 +45,8 @@ exports.createRoleManagement = async (req, res) => {
     });
   } catch (error) {
     console.error("Error occurred while creating role:", error);
-    return res.status(500).json({
-      message: "An error occurred while creating the role.",
+    return res.status(400).json({
+      message: error.message, // If role already exists, this will send the appropriate message
       error: error.message,
     });
   }

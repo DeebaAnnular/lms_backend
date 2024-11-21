@@ -2,6 +2,21 @@ const db = require("../config/db");
 
 class Role {
   static async createRole(role) {
+    // First, check if the roleName already exists
+    const checkQuery = `
+      SELECT COUNT(*) AS count
+      FROM roleManagement
+      WHERE roleName = ?
+    `;
+
+    const [result] = await db.query(checkQuery, [role.roleName]);
+
+    // If the role already exists, return an error
+    if (result[0].count > 0) {
+      throw new Error("Role with this name already exists.");
+    }
+
+    // Proceed with inserting the new role if it doesn't exist
     const query = `
       INSERT INTO roleManagement 
       (roleName, apply, edit, deleteRole, approve, designation, salary, isActive, createdBy, createdOn, updatedBy, updatedOn) 
