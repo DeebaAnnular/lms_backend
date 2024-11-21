@@ -146,6 +146,22 @@ class Role {
       throw error; // Throw error to be handled by the controller
     }
   }
+
+  // Model method to get role by roleId
+  static async getRoleById(roleId) {
+    try {
+      const query = `SELECT * FROM roleManagement WHERE id = ?`;
+      const [rows] = await db.query(query, [roleId]);
+
+      console.log("Query result for roleId:", roleId, rows); // Debug log
+
+      // If rows are found, return the first row, otherwise return null
+      return rows.length > 0 ? rows[0] : null;
+    } catch (error) {
+      console.error("Error in getRoleById:", error);
+      throw new Error("Error fetching role by ID.");
+    }
+  }
 }
 
 module.exports = Role;

@@ -19,11 +19,11 @@ exports.createRoleManagement = async (req, res) => {
   } = req.body;
 
   // Validate the required fields
-  if (!roleName || !designation) {
-    return res.status(400).json({
-      message: "Role name and designation are required.",
-    });
-  }
+  // if (!roleName || !designation) {
+  //   return res.status(400).json({
+  //     message: "Role name and designation are required.",
+  //   });
+  // }
 
   // Create a new role object
   const newRole = {
@@ -155,6 +155,42 @@ exports.deleteRole = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "An error occurred while deleting the role.",
+      error: error.message,
+    });
+  }
+};
+
+// Controller to get a role by roleId
+exports.getRoleByRoleId = async (req, res) => {
+  const { roleId } = req.params;
+
+  try {
+    // Ensure the roleId is a valid number (or adjust based on your database schema)
+    if (!roleId || isNaN(roleId)) {
+      return res.status(400).json({
+        message: "Invalid roleId. Please provide a valid role ID.",
+      });
+    }
+
+    // Fetch the role by roleId
+    const role = await Role.getRoleById(roleId);
+
+    // If the role is not found, return a 404 error
+    if (!role) {
+      return res.status(404).json({
+        message: `Role with ID '${roleId}' not found.`,
+      });
+    }
+
+    // Return the role if found
+    return res.status(200).json({
+      message: "Role retrieved successfully!",
+      role,
+    });
+  } catch (error) {
+    console.error("Error occurred while retrieving role:", error);
+    return res.status(500).json({
+      message: "An error occurred while retrieving the role.",
       error: error.message,
     });
   }

@@ -51,7 +51,7 @@ class User {
     // Insert the new user
     console.log("Date being inserted:", user.date_of_joining);
     return db.execute(
-      "INSERT INTO users (emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, role, work_email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO users (emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, roleId, work_email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         user.emp_id,
         user.emp_name,
@@ -61,7 +61,7 @@ class User {
         user.work_location,
         user.active_status,
         user.designation,
-        user.role,
+        user.roleId,
         user.work_email,
         user.password,
       ]
