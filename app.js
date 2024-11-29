@@ -6,6 +6,7 @@ const holidayRoutes = require("./routes/holidayRoutes");
 const assetRoutes = require("./routes/assetRoutes");
 const accessCardRoute = require("./routes/accessCardRoutes");
 const roleManagementRoutes = require("./routes/roleMagementRoutes.js");
+const roleManagerHistoryRoute = require("./routes/roleManagerHistoryRoute.js");
 const {
   checkForUnupdatedTasks,
 } = require("./cronJobs/checkForUnupdatedTasks.js");
@@ -43,6 +44,7 @@ app.use("/api/holiday", holidayRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/access_card", accessCardRoute);
 app.use("/api/role", roleManagementRoutes);
+app.use("/api/roleManagerHistory", roleManagerHistoryRoute);
 
 const PORT = process.env.PORT || 3000;
 
