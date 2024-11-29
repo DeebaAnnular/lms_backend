@@ -337,7 +337,6 @@ exports.approveOrRejectLeave = async (req, res) => {
     });
   }
 };
-// Email function to notify about leave approval or rejection
 const sendLeaveApprovalOrRejectionEmail = async (
   email,
   leaveRequestDetails,
@@ -348,6 +347,8 @@ const sendLeaveApprovalOrRejectionEmail = async (
     console.error("No email provided");
     return; // Skip sending email if no recipient email is provided
   }
+  // Log leaveRequestDetails to confirm the session field is present
+  console.log("Leave Request Details:", leaveRequestDetails);
 
   const subject =
     status === "approved"
@@ -356,21 +357,44 @@ const sendLeaveApprovalOrRejectionEmail = async (
 
   const text =
     status === "approved"
-      ? `Congratulations! Your leave request has been approved:
-      \n\nLeave Type: ${leaveRequestDetails.leave_type}
-      \nFrom Date: ${leaveRequestDetails.from_date}
-      \nTo Date: ${leaveRequestDetails.to_date}
-      \nTotal Days: ${leaveRequestDetails.total_days}
-      \nSession: ${leaveRequestDetails.session}
-      \n\nEnjoy your leave!`
-      : `Unfortunately, your leave request has been rejected:
-      \n\nLeave Type: ${leaveRequestDetails.leave_type}
-      \nFrom Date: ${leaveRequestDetails.from_date}
-      \nTo Date: ${leaveRequestDetails.to_date}
-      \nTotal Days: ${leaveRequestDetails.total_days}
-      \nSession: ${leaveRequestDetails.session}
-      \nReason for Rejection: ${reason}
-      \n\nPlease contact your manager for more information.`;
+      ? `Dear ${leaveRequestDetails.emp_name},
+
+Congratulations! Your leave request has been approved.
+
+Leave Type: ${leaveRequestDetails.leave_type}
+
+From Date: ${leaveRequestDetails.from_date}
+
+To Date: ${leaveRequestDetails.to_date}
+
+Total Day(s): ${leaveRequestDetails.total_days}
+
+Session: ${leaveRequestDetails.session}
+
+Enjoy your leave!
+
+Regards,
+Annular LMS Team
+This is a system-generated mail, kindly do not reply to this. For any queries, contact your Reporting Manager.`
+      : `Dear ${leaveRequestDetails.emp_name},
+
+Unfortunately, your leave request has been rejected.
+
+Leave Type: ${leaveRequestDetails.leave_type}
+
+From Date: ${leaveRequestDetails.from_date}
+
+To Date: ${leaveRequestDetails.to_date}
+
+Total Day(s): ${leaveRequestDetails.total_days}
+
+Session: ${leaveRequestDetails.session}
+
+Reason for Rejection: ${reason}
+
+Regards,
+Annular LMS Team
+This is a system-generated mail, kindly do not reply to this. For any queries, contact your Reporting Manager.`;
 
   const mailOptions = {
     from: "benishabeni21@gmail.com", // Sender address
@@ -386,6 +410,7 @@ const sendLeaveApprovalOrRejectionEmail = async (
     console.error("Error sending approval/rejection email:", error);
   }
 };
+
 exports.getLeaveHistory = async (req, res) => {
   try {
     // Parse userId from request parameters

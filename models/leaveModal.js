@@ -248,59 +248,88 @@ class EmployeeLeave {
         )
     `;
     try {
-        const [rows] = await db.execute(query, [
-            userId,
-            fromDate,
-            toDate,
-            fromDate,
-            toDate,
-        ]);
+      const [rows] = await db.execute(query, [
+        userId,
+        fromDate,
+        toDate,
+        fromDate,
+        toDate,
+      ]);
 
-        // Check for leave requests on the same date range
-        const existingLeaves = rows.filter(row => 
-            new Date(row.from_date).toDateString() === new Date(fromDate).toDateString() &&
-            new Date(row.to_date).toDateString() === new Date(toDate).toDateString()
-        );
+      // Check for leave requests on the same date range
+      const existingLeaves = rows.filter(
+        (row) =>
+          new Date(row.from_date).toDateString() ===
+            new Date(fromDate).toDateString() &&
+          new Date(row.to_date).toDateString() ===
+            new Date(toDate).toDateString()
+      );
 
-        if (existingLeaves.length > 0) {
-            // Case 1: Full day leave already exists
-            if (existingLeaves.some(leave => leave.session === 'full_day')) {
-                return { conflict: true, message: "A full day leave request already exists for the specified date." };
-            }
-
-            // Case 2: Applying for a session that already exists
-            if (session !== 'full_day' && existingLeaves.some(leave => leave.session === session)) {
-                return { conflict: true, message: `A leave request for ${session} session already exists on this date.` };
-            }
-
-            // Case 3: Both AN and FN sessions are already applied
-            if (session !== 'full_day' && existingLeaves.length === 2) {
-                return { conflict: true, message: "Both AN and FN sessions are already applied for this date." };
-            }
-
-            // Case 4: Applying full day when a half-day already exists
-            if (session === 'full_day' && existingLeaves.length > 0) {
-                return { conflict: true, message: "Leave already exists for this date. Cannot apply leave." };
-            }
+      if (existingLeaves.length > 0) {
+        // Case 1: Full day leave already exists
+        if (existingLeaves.some((leave) => leave.session === "full_day")) {
+          return {
+            conflict: true,
+            message:
+              "A full day leave request already exists for the specified date.",
+          };
         }
 
-        // Check for overlapping leave requests on different dates
-        const hasConflictingLeave = rows.some(row => 
-            (new Date(row.from_date) <= new Date(toDate) && new Date(row.to_date) >= new Date(fromDate)) &&
-            !(new Date(row.from_date).toDateString() === new Date(fromDate).toDateString() &&
-              new Date(row.to_date).toDateString() === new Date(toDate).toDateString())
-        );
-
-        if (hasConflictingLeave) {
-            return { conflict: true, message: "A leave request overlaps with the specified date range." };
+        // Case 2: Applying for a session that already exists
+        if (
+          session !== "full_day" &&
+          existingLeaves.some((leave) => leave.session === session)
+        ) {
+          return {
+            conflict: true,
+            message: `A leave request for ${session} session already exists on this date.`,
+          };
         }
 
-        return { conflict: false };
+        // Case 3: Both AN and FN sessions are already applied
+        if (session !== "full_day" && existingLeaves.length === 2) {
+          return {
+            conflict: true,
+            message:
+              "Both AN and FN sessions are already applied for this date.",
+          };
+        }
+
+        // Case 4: Applying full day when a half-day already exists
+        if (session === "full_day" && existingLeaves.length > 0) {
+          return {
+            conflict: true,
+            message: "Leave already exists for this date. Cannot apply leave.",
+          };
+        }
+      }
+
+      // Check for overlapping leave requests on different dates
+      const hasConflictingLeave = rows.some(
+        (row) =>
+          new Date(row.from_date) <= new Date(toDate) &&
+          new Date(row.to_date) >= new Date(fromDate) &&
+          !(
+            new Date(row.from_date).toDateString() ===
+              new Date(fromDate).toDateString() &&
+            new Date(row.to_date).toDateString() ===
+              new Date(toDate).toDateString()
+          )
+      );
+
+      if (hasConflictingLeave) {
+        return {
+          conflict: true,
+          message: "A leave request overlaps with the specified date range.",
+        };
+      }
+
+      return { conflict: false };
     } catch (error) {
-        console.error("Error in checkExistingLeaveRequest:", error);
-        throw error;
+      console.error("Error in checkExistingLeaveRequest:", error);
+      throw error;
     }
-}
+  }
   // ********** get pending leave request
 
   static async getPendingLeaveRequests() {
@@ -338,7 +367,7 @@ class EmployeeLeave {
 
   static async getLeaveRequestDetails(requestId) {
     const query =
-      "SELECT leave_request_id, user_id, emp_name, from_date, to_date, total_days, leave_type, status, reason, created_at, updated_at FROM leave_requests WHERE leave_request_id = ?";
+      "SELECT leave_request_id, user_id, emp_name, from_date, to_date, total_days, leave_type, session, status, reason, created_at, updated_at FROM leave_requests WHERE leave_request_id = ?";
     try {
       const [rows] = await db.execute(query, [requestId]);
       if (rows.length === 0) {
@@ -395,7 +424,6 @@ class EmployeeLeave {
       throw error;
     }
   }
-
 
   static async getAllApprovedAndRejectedRequests() {
     const query = `
