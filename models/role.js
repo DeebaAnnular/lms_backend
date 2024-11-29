@@ -161,6 +161,11 @@ class Role {
       throw error; // Throw error to be handled by the controller
     }
   }
+  static async findById(roleId) {
+    const query = "SELECT * FROM roleManagement WHERE id = ?";
+    const [rows] = await db.query(query, [roleId]);
+    return rows.length > 0 ? rows[0] : null; // Return the role if it exists, otherwise null
+  }
 
   // Model method to get role by roleId
   static async getRoleById(roleId) {
@@ -178,23 +183,27 @@ class Role {
     }
   }
 
-  // Get roles where the approve column is true
-  static async getApprovedRoles() {
-    const query = `SELECT id, roleName FROM roleManagement WHERE approve = true`;
-
+  // Get approved roles along with users assigned to those roles
+  static async getApprovedRolesWithUsers() {
+    const query = `
+      SELECT r.id AS roleId, r.roleName, u.user_id, u.emp_name
+      FROM roleManagement r
+      INNER JOIN users u ON u.roleId = r.id
+      WHERE r.approve = true;
+    `;
     try {
-      // Query the database and fetch the rows
       const [rows] = await db.query(query);
 
       // Log the result to inspect the data
-      console.log("Approved Roles:", rows);
+      console.log("Approved Roles with Users:", rows);
 
-      // Return the filtered roles
+      // Return the list of roles with the associated users
       return rows;
     } catch (error) {
-      console.error("Error fetching approved roles:", error);
+      console.error("Error fetching approved roles with users:", error);
       throw error; // Rethrow the error to handle it in the controller
     }
   }
 }
+
 module.exports = Role;

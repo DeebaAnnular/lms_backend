@@ -78,7 +78,7 @@ exports.getAllRoles = async (req, res) => {
     // Map the roles to clean them (if necessary) before returning
     const cleanRoles = roles.map((role) => {
       return {
-        roleId: role.roleId, // Ensure roleId is inc
+        id: role.id, // Ensure roleId is inc
         roleName: role.roleName || null, // Fallback for missing values
         apply: role.apply || false,
         edit: role.edit || false,
@@ -195,18 +195,18 @@ exports.getRoleByRoleId = async (req, res) => {
     });
   }
 };
-// Controller method for fetching approved roles
+// Controller method for fetching approved roles and their associated users
 exports.getApprovedRoles = async (req, res) => {
   try {
-    const approvedRoles = await Role.getApprovedRoles();
+    const approvedRolesWithUsers = await Role.getApprovedRolesWithUsers();
     return res.status(200).json({
       success: true,
-      data: approvedRoles,
+      data: approvedRolesWithUsers,
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Error fetching approved roles",
+      message: "Error fetching approved roles and users",
       error: error.message,
     });
   }
