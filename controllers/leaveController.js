@@ -131,7 +131,7 @@ exports.createLeaveRequest = async (req, res) => {
     }
 
     // Check if email exists
-    if (!user.work_emailemail) {
+    if (!user.work_email) {
       return res.status(400).json({ message: "User email not found" });
     }
 

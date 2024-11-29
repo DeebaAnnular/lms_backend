@@ -7,6 +7,7 @@ const {
   updateRole,
   deleteRole,
   getRoleByRoleId,
+  getApprovedRoles,
 } = require("../controllers/roleManagementController");
 
 // Route for creating a new role
@@ -20,5 +21,7 @@ router.put("/role/:roleId", updateRole);
 router.delete("/roles/:roleId", deleteRole);
 
 router.get("/getRoleByRoleId/:roleId", getRoleByRoleId);
+
+router.get("/getApprovedRoles", getApprovedRoles);
 
 module.exports = router;

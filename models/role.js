@@ -177,6 +177,24 @@ class Role {
       throw new Error("Error fetching role by ID.");
     }
   }
-}
 
+  // Get roles where the approve column is true
+  static async getApprovedRoles() {
+    const query = `SELECT id, roleName FROM roleManagement WHERE approve = true`;
+
+    try {
+      // Query the database and fetch the rows
+      const [rows] = await db.query(query);
+
+      // Log the result to inspect the data
+      console.log("Approved Roles:", rows);
+
+      // Return the filtered roles
+      return rows;
+    } catch (error) {
+      console.error("Error fetching approved roles:", error);
+      throw error; // Rethrow the error to handle it in the controller
+    }
+  }
+}
 module.exports = Role;
