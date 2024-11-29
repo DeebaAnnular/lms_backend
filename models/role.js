@@ -42,7 +42,7 @@ class Role {
 
   // Get all roles
   static async getAllRoles() {
-    const query = `SELECT * FROM roleManagement`;
+    const query = `SELECT * FROM roleManagement WHERE isActive = true`;
 
     try {
       // Query the database and ensure to get the rows
@@ -141,8 +141,7 @@ class Role {
 
   // Delete a role by roleId
   static async deleteRole(roleId) {
-    const query = `DELETE FROM roleManagement WHERE roleId = ?`;
-
+    const query = `UPDATE roleManagement SET isActive = false WHERE id = ?`;
     try {
       // Execute the delete query
       const [result] = await db.query(query, [roleId]);
