@@ -91,9 +91,29 @@ class User {
   }
 
   static getAllUsers() {
-    return db.execute(
-      "SELECT user_id, emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, roleId, work_email, created_at, updated_at FROM users"
-    );
+    return db.execute(`
+      SELECT 
+        u.user_id, 
+        u.emp_id, 
+        u.emp_name, 
+        u.gender, 
+        u.date_of_joining, 
+        u.contact_number, 
+        u.work_location, 
+        u.active_status, 
+        u.designation, 
+        u.roleId, 
+        r.roleName AS roleName, -- Fetch roleName from roleManagement
+        u.work_email, 
+        u.created_at, 
+        u.updated_at
+      FROM 
+        users u
+      LEFT JOIN 
+        roleManagement r
+      ON 
+        u.roleId = r.id; -- Replace r.id with the correct primary key column in roleManagement
+    `);
   }
 
   static getUserDetailsById(userId) {

@@ -191,6 +191,7 @@ exports.getAllUsers = async (req, res) => {
       active_status: row.active_status,
       designation: row.designation,
       roleId: row.roleId,
+      roleName: row.roleName, // Add this field
       work_email: row.work_email,
       created_at: row.created_at,
       updated_at: row.updated_at,
