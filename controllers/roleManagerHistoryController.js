@@ -1,15 +1,21 @@
 const { format } = require("date-fns");
 const RoleManagerHistory = require("../models/roleManagerHistoryModel"); // Import the Role model
 exports.saveRoleManagerHistory = async (req, res) => {
-  const { userId, effective_from, effectiveTill, IsActive, createdBy, roleId } =
-    req.body;
+  const {
+    userId,
+    effective_from,
+    effectiveTill,
+    IsActive,
+    createdBy,
+    rmUserId,
+  } = req.body;
 
   // Validate required fields
-  if (!userId || !effective_from || !roleId || !createdBy) {
+  if (!userId || !effective_from || !rmUserId || !createdBy) {
     return res.status(400).json({
       success: false,
       message:
-        "Missing required fields: userId, effective_from, roleId, createdBy.",
+        "Missing required fields: userId, effective_from, rmUserId, createdBy.",
     });
   }
 
@@ -22,7 +28,7 @@ exports.saveRoleManagerHistory = async (req, res) => {
         effectiveTill,
         IsActive,
         createdBy,
-        roleId
+        rmUserId
       );
 
     // Respond with success
@@ -36,7 +42,7 @@ exports.saveRoleManagerHistory = async (req, res) => {
         effectiveTill,
         IsActive,
         createdBy,
-        roleId,
+        rmUserId,
       },
     });
   } catch (error) {
