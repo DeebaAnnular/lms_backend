@@ -96,6 +96,12 @@ class BankDetails {
       throw error;
     }
   }
+
+  static async getBankDetailByUserId(userId) {
+    const query = `SELECT * FROM bankDetails WHERE userId = ? LIMIT 1`; // Adjust table name as needed
+    const [rows] = await db.query(query, [userId]);
+    return rows.length > 0 ? rows[0] : null; // Return the first row if found, otherwise null
+  }
 }
 
 module.exports = BankDetails;

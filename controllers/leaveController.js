@@ -69,7 +69,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Send leave request email
 const sendLeaveRequestEmail = async (email, leaveRequestDetails) => {
   if (!email) {
     console.error("No email provided");
@@ -79,16 +78,28 @@ const sendLeaveRequestEmail = async (email, leaveRequestDetails) => {
   const mailOptions = {
     from: "benishabeni21@gmail.com", // Sender address
     to: email, // Receiver's email address
-    subject: "Leave Request Created Successfully", // Subject line
-    text: `Your leave request has been successfully created:
-    \n\nLeave Type: ${leaveRequestDetails.leave_type}
-    \nFrom Date: ${leaveRequestDetails.from_date}
-    \nTo Date: ${leaveRequestDetails.to_date}
-    \nTotal Days: ${leaveRequestDetails.total_days}
-    \nSession: ${leaveRequestDetails.session}
-    \nReason: ${leaveRequestDetails.reason}
-    \nStatus: Pending
-    \n\nThank you.`,
+    subject: "Leave Request Submitted Successfully", // Subject line
+    text: `Dear ${leaveRequestDetails.emp_name},
+
+Your leave request has been submitted successfully.
+
+Leave Type: ${leaveRequestDetails.leave_type}
+
+From Date: ${leaveRequestDetails.from_date}
+
+To Date: ${leaveRequestDetails.to_date}
+
+Total Day(s): ${leaveRequestDetails.total_days}
+
+Session: ${leaveRequestDetails.session}
+
+Reason: ${leaveRequestDetails.reason || "N/A"}
+
+Approval Status: Pending
+
+Regards,
+Annular LMS Team
+This is a system-generated mail, kindly do not reply to this. For any queries, contact your Reporting Manager.`,
   };
 
   try {

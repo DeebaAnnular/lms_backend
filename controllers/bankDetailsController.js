@@ -2,7 +2,21 @@ const BankDetails = require("../models/bankDetailsModel");
 
 exports.createBankDetail = async (req, res) => {
   const bankDetail = req.body;
+
   try {
+    // Step 1: Check if a record with the same userId already exists
+    const existingBankDetail = await BankDetails.getBankDetailByUserId(
+      bankDetail.userId
+    );
+
+    if (existingBankDetail) {
+      return res.status(400).json({
+        success: false,
+        message: "Bank detail for this userId already exists.",
+      });
+    }
+
+    // Step 2: If no existing record, insert the new bank detail
     const result = await BankDetails.createBankDetail(bankDetail);
     console.log("Result from createBankDetail:", result); // Log the result for debugging
 
