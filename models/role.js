@@ -77,13 +77,13 @@ class Role {
       isActive,
       updatedBy,
       updatedOn,
-    } = roleData;
+    } = roleData; // Removed duplicate roleId from destructuring
 
     const query = `
     UPDATE roleManagement
     SET roleName = ?, apply = ?, edit = ?, deleteRole = ?, approve = ?, 
         designation = ?, salary = ?, isActive = ?, updatedBy = ?, updatedOn = ?
-    WHERE roleId = ?`;
+    WHERE id = ?`; // Corrected WHERE clause syntax
 
     const values = [
       roleName,
@@ -96,14 +96,14 @@ class Role {
       isActive,
       updatedBy,
       updatedOn,
-      roleId,
+      roleId, // roleId is now only used in the WHERE clause
     ];
 
     try {
       // Execute the update query
       const [result] = await db.query(query, values);
 
-      // Ensure to return an object with success if affectedRows is 0
+      // Check if no rows were affected
       if (result.affectedRows === 0) {
         return {
           success: false,
@@ -134,8 +134,8 @@ class Role {
       return {
         success: false,
         message: "An error occurred while updating the role.",
-        error: error.message,
-      }; // Ensure that an object is always returned
+        error: error.message, // Provide detailed error message
+      };
     }
   }
 

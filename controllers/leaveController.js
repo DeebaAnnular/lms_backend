@@ -212,6 +212,7 @@ exports.createLeaveRequest = async (req, res) => {
 
     // Send the leave request email after the request is successfully created
     await sendLeaveRequestEmail(user.work_email, {
+      emp_name: user.emp_name,
       leave_type,
       from_date,
       to_date,

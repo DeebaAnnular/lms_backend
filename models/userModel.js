@@ -92,7 +92,7 @@ class User {
 
   static getAllUsers() {
     return db.execute(
-      "SELECT user_id, emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, role, work_email, created_at, updated_at FROM users"
+      "SELECT user_id, emp_id, emp_name, gender, date_of_joining, contact_number, work_location, active_status, designation, roleId, work_email, created_at, updated_at FROM users"
     );
   }
 
