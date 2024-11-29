@@ -48,3 +48,40 @@ exports.saveRoleManagerHistory = async (req, res) => {
     });
   }
 };
+exports.getRoleManagerHistoryByUserId = async (req, res) => {
+  const { userId } = req.params; // Extract userId from URL params
+
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing required parameter: userId",
+    });
+  }
+
+  try {
+    // Call the method to fetch role manager history for the given userId
+    const roleManagerHistoryData =
+      await RoleManagerHistory.getRoleManagerHistoryByUserId(userId);
+
+    if (roleManagerHistoryData.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No role manager history found for userId: ${userId}`,
+      });
+    }
+
+    // Respond with the data
+    return res.status(200).json({
+      success: true,
+      message: "Role Manager History retrieved successfully.",
+      data: roleManagerHistoryData,
+    });
+  } catch (error) {
+    console.error("Error fetching role manager history:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching role manager history",
+      error: error.message,
+    });
+  }
+};

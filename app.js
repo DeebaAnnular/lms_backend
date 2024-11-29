@@ -7,6 +7,7 @@ const assetRoutes = require("./routes/assetRoutes");
 const accessCardRoute = require("./routes/accessCardRoutes");
 const roleManagementRoutes = require("./routes/roleMagementRoutes.js");
 const roleManagerHistoryRoute = require("./routes/roleManagerHistoryRoute.js");
+const bankDetailsRoutes = require("./routes/bankDetailsRoutes.js");
 const {
   checkForUnupdatedTasks,
 } = require("./cronJobs/checkForUnupdatedTasks.js");
@@ -45,6 +46,7 @@ app.use("/api/assets", assetRoutes);
 app.use("/api/access_card", accessCardRoute);
 app.use("/api/role", roleManagementRoutes);
 app.use("/api/roleManagerHistory", roleManagerHistoryRoute);
+app.use("/api/bankDetails", bankDetailsRoutes);
 
 const PORT = process.env.PORT || 3000;
 

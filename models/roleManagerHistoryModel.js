@@ -30,6 +30,35 @@ class RoleManagerHistory {
       throw error; // Throw error to be handled in the controller
     }
   }
-}
 
+  // Method to get role manager history by userId
+  static async getRoleManagerHistoryByUserId(userId) {
+    const query = `
+    SELECT * FROM roleManagerHistory WHERE userId = ?
+  `;
+
+    try {
+      const [result] = await db.query(query, [userId]);
+      return result; // Return an array of records
+    } catch (error) {
+      console.error("Error fetching role manager history by userId:", error);
+      throw error; // Throw error to be handled in the controller
+    }
+  }
+
+  // Method to get role manager history by userId
+  static async getRoleManagerHistoryByUserId(userId) {
+    const query = `
+    SELECT * FROM roleManagerHistory WHERE userId = ?
+  `;
+
+    try {
+      const [result] = await db.query(query, [userId]);
+      return result; // Return an array of records
+    } catch (error) {
+      console.error("Error fetching role manager history by userId:", error);
+      throw error; // Throw error to be handled in the controller
+    }
+  }
+}
 module.exports = RoleManagerHistory;
