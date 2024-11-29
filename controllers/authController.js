@@ -50,6 +50,11 @@ exports.register = async (req, res) => {
     if (existingContactNumber) {
       return res.status(400).json({ message: "Contact number already exists" });
     }
+    // Check if the roleId exists in the roleManagement table
+    const roleExists = await Role.findById(roleId); // Assuming you have a method to check role existence
+    if (!roleExists) {
+      return res.status(400).json({ message: "Invalid roleId provided" });
+    }
 
     const hashedPassword = await hashPassword(password);
 
