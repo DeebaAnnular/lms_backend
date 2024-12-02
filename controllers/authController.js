@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const User = require("../models/userModel");
+const Role =require("../models/role");
 const { generateToken, verifyToken } = require("../utils/token");
 const { hashPassword, comparePassword } = require("../utils/hash");
 
